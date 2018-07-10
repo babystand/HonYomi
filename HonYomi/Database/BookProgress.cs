@@ -1,13 +1,15 @@
-﻿namespace DataLib
+﻿using System;
+
+namespace DataLib
 {
     public class BookProgress
     {
-        public int         BookProgressId { get; set; }
-        public int         UserId         { get; set; }
+        public Guid         BookProgressId { get; set; }
+        public Guid         UserId         { get; set; }
         public User        User           { get; set; }
-        public int         BookId         { get; set; }
+        public Guid         BookId         { get; set; }
         public IndexedBook Book           { get; set; }
-        public int         FileId         { get; set; }
+        public Guid         FileId         { get; set; }
         public IndexedFile File           { get; set; }
     }
 }

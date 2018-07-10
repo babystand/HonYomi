@@ -12,7 +12,7 @@ public class DirectoryScanner
 
         internal static IEnumerable<ScannedBook> ScanDirectory(string path)
         {
-            
+            path = Path.GetFullPath(path);
             if (Directory.Exists(path))
             {
                 List<ScannedFile> files = Directory.GetFiles(path).OrderBy(x => x).Select(ScanFile).Where(x => audioExtensions.Contains(x.Extension)).ToList();

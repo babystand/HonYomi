@@ -4,15 +4,15 @@ using HonYomi.Core;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace Tests
+namespace HonYomi.Tests
 {
     public class ScanTests
     {
+        private const string rootPath = "../../../scanTestDir";
 
         [Test]
         public void ScansBooksBasic()
         {
-            string rootPath = "../../../scanTestDir";
             var books = DirectoryScanner.ScanDirectory(rootPath).ToArray();
             Assert.AreEqual(3, books.Length);
             Assert.IsTrue(books.Any(x => x.Name == "A1" && x.Files.Count == 2));
@@ -21,8 +21,8 @@ namespace Tests
         [Test]
         public void ScansBooksBasicAndInserts()
         {
-            string rootPath = "../../../scanTestDir";
-            var    books    = DirectoryScanner.ScanDirectory(rootPath).ToArray();
+            var books = DirectoryScanner.ScanDirectory(rootPath).ToArray();
+            HonyomiContext.DeleteDatabase();
             using (var db = new HonyomiContext())
             {
                 db.InsertNewBooks(books);

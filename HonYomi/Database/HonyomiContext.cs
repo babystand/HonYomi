@@ -72,5 +72,44 @@ namespace DataLib
 
             SaveChanges();
         }
+
+        public void RemoveMissing()
+        {
+            List<Guid> removedFileIds = new List<Guid>();
+            List<Guid> removedBookIds = new List<Guid>();
+            foreach (IndexedFile file in Files)
+            {
+                if (!File.Exists(file.FilePath))
+                {
+                    Files.Remove(file);
+                    removedFileIds.Add(file.IndexedFileId);
+                }
+            }
+
+            foreach (IndexedBook book in Books)
+            {
+                if (!book.Files.Any())
+                {
+                    Books.Remove(book);
+                    removedBookIds.Add(book.IndexedBookId);
+                }
+            }
+
+            foreach (Guid fileId in removedFileIds)
+            {
+                var referencedFileProgresses = FileProgresses.Where(x => x.FileId == fileId);
+                FileProgresses.RemoveRange(referencedFileProgresses);
+            }
+
+            foreach (Guid bookId in removedBookIds)
+            {
+                var referencedBookProgresses = BookProgresses.Where(x => x.BookId == bookId);
+                BookProgresses.RemoveRange(referencedBookProgresses);
+            }
+
+            SaveChanges();
+
+
+        }
     }
 }
