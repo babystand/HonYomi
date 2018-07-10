@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HonYomi", "HonYomi\HonYomi.csproj", "{DFF05C97-928F-4116-A392-41068AE678B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HonYomi.Tests", "HonYomi.Tests\HonYomi.Tests.csproj", "{99ED24A2-2692-40C9-8142-70132B0FAACE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{DFF05C97-928F-4116-A392-41068AE678B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFF05C97-928F-4116-A392-41068AE678B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFF05C97-928F-4116-A392-41068AE678B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99ED24A2-2692-40C9-8142-70132B0FAACE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99ED24A2-2692-40C9-8142-70132B0FAACE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99ED24A2-2692-40C9-8142-70132B0FAACE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99ED24A2-2692-40C9-8142-70132B0FAACE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
