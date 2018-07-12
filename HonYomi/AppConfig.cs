@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 public static class RuntimeConstants
 {
     public static readonly string DataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config",
-                                                "onyomi");
-    public static readonly string DatabaseLocation = Path.Combine(DataDir, "onyomi.db");
+                                                "honyomi");
+    public static readonly string DatabaseLocation = Path.Combine(DataDir, "honyomi.db");
     public static readonly string TempDir = Path.Combine(DataDir, "temp");
 }
