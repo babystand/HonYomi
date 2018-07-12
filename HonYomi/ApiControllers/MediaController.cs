@@ -13,20 +13,70 @@ namespace HonYomi.ApiControllers
         [Route("/api/getfile/{id}")]
         public FileStreamResult GetAudioFile(Guid id)
         {
-            string path;
+            string path, mimeType;
             using (var db = new HonyomiContext())
             {
-                path = db.Files.First(x => x.IndexedFileId == id).FilePath;
+                var file = db.Files.First(x => x.IndexedFileId == id);
+                path = file.FilePath;
+                mimeType = file.MimeType;
             }
-            return File(System.IO.File.OpenRead(path), "audio/mpeg", true);
+            return File(System.IO.File.OpenRead(path), mimeType, true);
 
+        }
+
+        [HttpGet]
+        [Route("/api/trackprogress/get/{userId}/{trackId}")]
+        public IActionResult GetTrackProgress(Guid userId, Guid trackId)
+        {
+            try
+            {
+                using (var db = new HonyomiContext())
+                {
+                    return Json(db.GetUserFileProgress(userId, trackId));
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpGet]
+        [Route("/api/trackprogress/set/{userId}/{trackId}/{seconds}")]
+        public IActionResult SetTrackProgress(Guid userId, Guid trackId, uint seconds)
+        {
+            try
+            {
+                using (var db = new HonyomiContext())
+                {
+                    FileProgress prog =
+                        db.FileProgresses.SingleOrDefault(x => x.UserId == userId && x.FileId == trackId);
+                    if (prog == null)
+                    {
+                        db.FileProgresses.Add(
+                            new FileProgress {FileId = trackId, UserId = userId, Progress = seconds});
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        prog.Progress = seconds;
+                        db.SaveChanges();
+                    }
+
+                    return Ok();
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet]
         [Route("/api/getlongfile")]
         public FileStreamResult GetLongFile()
         {
-            string path = "../HonYomi.Tests/long.mp3";
+            const string path = "../HonYomi.Tests/long.mp3";
             return File(System.IO.File.OpenRead(path), "audio/mpeg", true);
         }
     }

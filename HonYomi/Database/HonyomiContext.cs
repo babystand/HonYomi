@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HonYomi.Core;
+using HonYomi.Exposed;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLib
@@ -19,31 +20,30 @@ namespace DataLib
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config",
-                                        "onyomi");
-            var dbPath = Path.Combine(dataPath, "onyomi.db");
-            if (!File.Exists(dbPath))
+
+            if (!File.Exists(RuntimeConstants.DatabaseLocation))
             {
-                Directory.CreateDirectory(dataPath);
-                File.Create(dbPath);
+                Directory.CreateDirectory(RuntimeConstants.DataDir);
+                File.Create(RuntimeConstants.DatabaseLocation);
             }
-            optionsBuilder.UseSqlite($"Data Source={dbPath}");
+            optionsBuilder.UseSqlite($"Data Source={RuntimeConstants.DatabaseLocation}");
 
         }
 
         public static void DeleteDatabase()
         {
-            var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config",
-                                        "onyomi");
-            var dbPath = Path.Combine(dataPath, "onyomi.db");
-            if(File.Exists(dbPath))
-                File.Delete(dbPath);
+            if(File.Exists(RuntimeConstants.DatabaseLocation))
+                File.Delete(RuntimeConstants.DatabaseLocation);
         }
         
 
         public HonyomiContext()
         {
-            Database.EnsureCreated();
+            //true if database had to be created
+            if (Database.EnsureCreated())
+            {
+                CreateDefaults();
+            }
         }
 
         public void CreateDefaults()
@@ -64,7 +64,8 @@ namespace DataLib
                         TrackIndex = x.Index,
                         Filename   = x.Name,
                         Title      = x.Name,
-                        FilePath   = x.Path
+                        FilePath   = x.Path,
+                        MimeType = x.MimeType
                     }).ToList();
                     Books.Add(new IndexedBook() {DirectoryPath = book.Path, Files = files, Title = book.Name});
                 }
@@ -110,6 +111,45 @@ namespace DataLib
             SaveChanges();
 
 
+        }
+
+        public FileWithProgress GetUserFileProgress(Guid userId, Guid fileId)
+        {
+            IndexedFile file = Files.Include(x => x.Book).Single(x => x.IndexedFileId == fileId);
+            FileWithProgress result = new FileWithProgress
+            {
+                Guid      = fileId,
+                Title     = file.Title,
+                BookGuid  = file.BookId,
+                BookTitle = file.Book.Title
+            };
+            FileProgress fProg = FileProgresses.SingleOrDefault(x => x.FileId == fileId && x.UserId == userId);
+            if (fProg == null)
+                result.ProgressSeconds = 0;
+            else
+                result.ProgressSeconds = fProg.Progress;
+            return result;
+        }
+
+        public BookWithProgress GetUserBookProgress(Guid userId, Guid bookId)
+        {
+            IndexedBook book = Books.Include(x => x.Files).Single(x => x.IndexedBookId == bookId);
+            
+            BookProgress bookp = 
+                BookProgresses.SingleOrDefault(x => x.BookId == bookId && x.UserId == userId);
+            BookWithProgress result = new BookWithProgress
+            {
+                FileProgresses   = book.Files.Select(x => GetUserFileProgress(userId, x.IndexedFileId)).ToArray(),
+                Guid             = book.IndexedBookId,
+                CurrentTrackGuid = bookp?.FileId ?? book.Files.First().IndexedFileId,
+                Title            = book.Title
+            };
+            return result;
+        }
+
+        public BookWithProgress[] GetUserBooks(Guid userId)
+        {
+            return Books.Select(x => GetUserBookProgress(userId, x.IndexedBookId)).ToArray();
         }
     }
 }

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DataLib;
 
 namespace HonYomi.Core
 {
-
-public class DirectoryScanner
+    public class DirectoryScanner
     {
         private static readonly string[] audioExtensions = {".m4a", ".mp3", ".ogg", ".opus", ".wav"};
 
@@ -15,7 +15,8 @@ public class DirectoryScanner
             path = Path.GetFullPath(path);
             if (Directory.Exists(path))
             {
-                List<ScannedFile> files = Directory.GetFiles(path).OrderBy(x => x).Select(ScanFile).Where(x => audioExtensions.Contains(x.Extension)).ToList();
+                List<ScannedFile> files = Directory.GetFiles(path).OrderBy(x => x).Select(ScanFile)
+                    .Where(x => audioExtensions.Contains(x.Extension)).ToList();
                 if (files.Any())
                 {
                     yield return new ScannedBook(path, Path.GetFileName(path), files);
@@ -30,39 +31,71 @@ public class DirectoryScanner
                 }
             }
         }
+
         private static ScannedFile ScanFile(string path, int index)
         {
-            return new ScannedFile(path, Path.GetFileNameWithoutExtension(path), Path.GetExtension(path), index);
+            return new ScannedFile(path, Path.GetFileNameWithoutExtension(path), Path.GetExtension(path), index, GetMimeType(Path.GetExtension(path)));
+        }
+
+        private static string GetMimeType(string extension)
+        {
+            switch (extension)
+            {
+                case ".aac": return "audio/aac";
+                case ".mp4":
+                case ".m4a": return "audio/mp4";
+                case ".mp1":
+                case ".mp2":
+                case ".mp3":
+                case ".mpg":
+                case ".mpeg": return "audio/mpeg";
+                case ".ogg":
+                case ".oga": return "audio/ogg";
+                case ".wav":  return "audio/wav";
+                case ".webm": return "audio/webm";
+                default:      return "audio/mpeg";
+            }
+        }
+
+        internal static  void ScanWatchDirectories()
+        {
+            using (var db = new HonyomiContext())
+            {
+                var scanned = db.WatchDirectories.Select(x => x.Path).ToList().SelectMany(ScanDirectory);
+                db.InsertNewBooks(scanned);
+            }
         }
     }
 
     internal class ScannedBook
     {
-        public string Path { get; }
-        public string Name { get; }
+        public string            Path  { get; }
+        public string            Name  { get; }
         public List<ScannedFile> Files { get; }
 
         public ScannedBook(string path, string name, List<ScannedFile> files)
         {
-            Path = path;
-            Name = name;
+            Path  = path;
+            Name  = name;
             Files = files;
         }
     }
 
     internal class ScannedFile
     {
-        public string Path { get; }
-        public string Name { get; }
+        public string Path      { get; }
+        public string Name      { get; }
         public string Extension { get; }
-        public int Index { get; }
+        public string MimeType { get; set; }
+        public int    Index     { get; }
 
-        public ScannedFile(string path, string name, string extension, int index)
+        public ScannedFile(string path, string name, string extension, int index, string mime)
         {
-            Path = path;
-            Name = name;
+            Path      = path;
+            Name      = name;
             Extension = extension;
-            Index = index;
+            Index     = index;
+            MimeType = mime;
         }
     }
 }

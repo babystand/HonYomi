@@ -9,6 +9,6 @@ namespace DataLib
         public User        User           { get; set; }
         public Guid         FileId         { get; set; }
         public IndexedFile File           { get; set; }
-        public long        Progress       { get; set; }
+        public uint        Progress       { get; set; } //in seconds
     }
 }
