@@ -9,4 +9,6 @@ public static class RuntimeConstants
                                                 "honyomi");
     public static readonly string DatabaseLocation = Path.Combine(DataDir, "honyomi.db");
     public static readonly string TempDir = Path.Combine(DataDir, "temp");
+    public static readonly string JwtKey = "Ain't got no time for config files";
+//    public static readonly string JwtIssuer = ""
 }

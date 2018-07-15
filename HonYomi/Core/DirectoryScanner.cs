@@ -57,7 +57,7 @@ namespace HonYomi.Core
             }
         }
 
-        internal static  void ScanWatchDirectories()
+        public static  void ScanWatchDirectories()
         {
             using (var db = new HonyomiContext())
             {

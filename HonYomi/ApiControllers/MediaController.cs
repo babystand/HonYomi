@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DataLib;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -10,6 +11,7 @@ namespace HonYomi.ApiControllers
     public class MediaController : Controller
     {
         [HttpGet]
+        [Authorize]
         [Route("/api/getfile/{id}")]
         public FileStreamResult GetAudioFile(Guid id)
         {
@@ -25,8 +27,9 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("/api/trackprogress/get/{userId}/{trackId}")]
-        public IActionResult GetTrackProgress(Guid userId, Guid trackId)
+        public IActionResult GetTrackProgress(string userId, Guid trackId)
         {
             try
             {
@@ -43,7 +46,7 @@ namespace HonYomi.ApiControllers
 
         [HttpGet]
         [Route("/api/trackprogress/set/{userId}/{trackId}/{seconds}")]
-        public IActionResult SetTrackProgress(Guid userId, Guid trackId, uint seconds)
+        public IActionResult SetTrackProgress(string userId, Guid trackId, uint seconds)
         {
             try
             {

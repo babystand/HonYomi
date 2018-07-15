@@ -4,13 +4,13 @@ using System.IO;
 using System.Linq;
 using HonYomi.Core;
 using HonYomi.Exposed;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLib
 {
-    internal sealed class HonyomiContext : DbContext
+    public sealed class HonyomiContext : IdentityDbContext
     {
-        public DbSet<User> Users { get; set; }
         public DbSet<IndexedBook> Books { get; set; }
         public DbSet<IndexedFile> Files { get; set; }
         public DbSet<BookProgress> BookProgresses { get; set; }
@@ -21,14 +21,11 @@ namespace DataLib
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
 
-            if (!File.Exists(RuntimeConstants.DatabaseLocation))
-            {
-                Directory.CreateDirectory(RuntimeConstants.DataDir);
-                File.Create(RuntimeConstants.DatabaseLocation);
-            }
+            
             optionsBuilder.UseSqlite($"Data Source={RuntimeConstants.DatabaseLocation}");
 
         }
+        
 
         public static void DeleteDatabase()
         {
@@ -37,23 +34,16 @@ namespace DataLib
         }
         
 
-        public HonyomiContext()
-        {
-            //true if database had to be created
-            if (Database.EnsureCreated())
-            {
-                CreateDefaults();
-            }
-        }
+    
 
         public void CreateDefaults()
         {
-            Users.Add(new User {Username = "admin", HashedPass = "9BC7AA55F08FDAD935C3F8362D3F48BCF70EB280", HashSalt = "salt", IsAdmin = true});
-            Configs.Add(new HonyomiConfig{ScanInterval = 0, ServerPort = 5367, WatchForChanges = false});
+//            Users.Add(new HonyomiUser {Username = "admin", HashedPass = "9BC7AA55F08FDAD935C3F8362D3F48BCF70EB280", HashSalt = "salt", IsAdmin = true});
+            Configs.Add(new HonyomiConfig{ScanInterval = 59, ServerPort = 5367, WatchForChanges = false});
             SaveChanges();
         }
 
-        public void InsertNewBooks(IEnumerable<ScannedBook> books)
+        internal void InsertNewBooks(IEnumerable<ScannedBook> books)
         {
             foreach (ScannedBook book in books)
             {
@@ -113,7 +103,7 @@ namespace DataLib
 
         }
 
-        public FileWithProgress GetUserFileProgress(Guid userId, Guid fileId)
+        public FileWithProgress GetUserFileProgress(string userId, Guid fileId)
         {
             IndexedFile file = Files.Include(x => x.Book).Single(x => x.IndexedFileId == fileId);
             FileWithProgress result = new FileWithProgress
@@ -131,7 +121,7 @@ namespace DataLib
             return result;
         }
 
-        public BookWithProgress GetUserBookProgress(Guid userId, Guid bookId)
+        public BookWithProgress GetUserBookProgress(string userId, Guid bookId)
         {
             IndexedBook book = Books.Include(x => x.Files).Single(x => x.IndexedBookId == bookId);
             
@@ -147,7 +137,7 @@ namespace DataLib
             return result;
         }
 
-        public BookWithProgress[] GetUserBooks(Guid userId)
+        public BookWithProgress[] GetUserBooks(string userId)
         {
             return Books.Select(x => GetUserBookProgress(userId, x.IndexedBookId)).ToArray();
         }

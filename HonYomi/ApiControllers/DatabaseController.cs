@@ -1,6 +1,7 @@
 ﻿using System;
 using DataLib;
 using HonYomi.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HonYomi.ApiControllers
@@ -9,6 +10,7 @@ namespace HonYomi.ApiControllers
     public class DatabaseController : Controller
     {
         [HttpGet]
+        [Authorize]
         [Route("/api/db/clean")]
         public IActionResult RemoveMissing()
         {
@@ -27,6 +29,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("/api/db/scan")]
         public IActionResult ScanNow()
         {
@@ -42,8 +45,9 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
+        [Authorize]
         [Route("/api/db/books/{userId}")]
-        public IActionResult GetBooksForUser(Guid userId)
+        public IActionResult GetBooksForUser(string userId)
         {
             try
             {
