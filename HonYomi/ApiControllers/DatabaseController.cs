@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using DataLib;
 using HonYomi.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -31,11 +32,11 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize]
         [Route("/api/db/scan")]
-        public IActionResult ScanNow()
+        public async Task<IActionResult> ScanNow()
         {
             try
             {
-                DirectoryScanner.ScanWatchDirectories();
+                await DirectoryScanner.ScanWatchDirectories();
                 return Ok();
             }
             catch (Exception)
@@ -44,16 +45,17 @@ namespace HonYomi.ApiControllers
             }
         }
 
+        
         [HttpGet]
         [Authorize]
-        [Route("/api/db/books/{userId}")]
-        public IActionResult GetBooksForUser(string userId)
+        [Route("/api/books/list/{userId}")]
+        public async Task<IActionResult> GetBooksForUser(string userId)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
-                    return Json(db.GetUserBooks(userId));
+                    return Json(await db.GetUserBooks(userId));
                 }
             }
             catch (Exception)

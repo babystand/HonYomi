@@ -31,7 +31,7 @@ namespace HonYomi.ApiControllers
 
         [HttpGet]
         [Authorize]
-        [Route("/api/track/progress/get/{userId}/{trackId}")]
+        [Route("/api/tracks/progress/get/{userId}/{trackId}")]
         public async Task<IActionResult> GetTrackProgress(string userId, Guid trackId)
         {
             try

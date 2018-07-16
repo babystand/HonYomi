@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using DataLib;
+using Microsoft.EntityFrameworkCore;
 
 namespace HonYomi.Core
 {
@@ -57,12 +59,12 @@ namespace HonYomi.Core
             }
         }
 
-        public static  void ScanWatchDirectories()
+        public static  async Task ScanWatchDirectories()
         {
             using (var db = new HonyomiContext())
             {
-                var scanned = db.WatchDirectories.Select(x => x.Path).ToList().SelectMany(ScanDirectory);
-                db.InsertNewBooks(scanned);
+                var scanned = db.WatchDirectories.Select(x => x.Path).AsEnumerable().SelectMany(ScanDirectory);
+                await db.InsertNewBooks(scanned);
             }
         }
     }

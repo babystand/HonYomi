@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace HonYomi.ApiControllers
@@ -31,8 +32,8 @@ namespace HonYomi.ApiControllers
             var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
             if (result.Succeeded)
             {
-                var user = userManager.Users.SingleOrDefault(r => r.UserName == model.Username);
-                return await GenerateJwtToken(model.Username, user);
+                var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == model.Username);
+                return GenerateJwtToken(model.Username, user);
             }
             throw new ApplicationException("Bad login");
         }
@@ -51,12 +52,12 @@ namespace HonYomi.ApiControllers
             if (result.Succeeded)
             {
                 await signInManager.SignInAsync(user, false);
-                return await GenerateJwtToken(model.Username, user);
+                return  GenerateJwtToken(model.Username, user);
             }
             
             throw new ApplicationException("UNKNOWN_ERROR");
         }
-        private async Task<object> GenerateJwtToken(string username, IdentityUser user)
+        private string GenerateJwtToken(string username, IdentityUser user)
         {
             var claims = new List<Claim>
                          {

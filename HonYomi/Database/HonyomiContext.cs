@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using HonYomi.ApiControllers;
 using HonYomi.Core;
 using HonYomi.Exposed;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,7 +23,6 @@ namespace DataLib
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
             
             optionsBuilder.UseSqlite($"Data Source={RuntimeConstants.DatabaseLocation}");
 
@@ -33,13 +34,14 @@ namespace DataLib
             if(File.Exists(RuntimeConstants.DatabaseLocation))
                 File.Delete(RuntimeConstants.DatabaseLocation);
         }
-        
 
-    
 
-        public async Task CreateDefaults()
+
+
+        public async Task CreateDefaults(UserManager<IdentityUser> userManager)
         {
-//            Users.Add(new HonyomiUser {Username = "admin", HashedPass = "9BC7AA55F08FDAD935C3F8362D3F48BCF70EB280", HashSalt = "salt", IsAdmin = true});
+            var user = new IdentityUser("admin");
+            await userManager.CreateAsync(user, "adminPassword");
             await Configs.AddAsync(new HonyomiConfig{ScanInterval = 59, ServerPort = 5367, WatchForChanges = false});
             await SaveChangesAsync();
         }
@@ -184,7 +186,7 @@ namespace DataLib
 
         public async Task<BookWithProgress[]> GetUserBooks(string userId)
         {
-            return  await Task.WhenAll(Books.Select(async x =>  await GetUserBookProgress(userId, x.IndexedBookId)));
+            return  await Task.WhenAll(Books.Select( x =>   GetUserBookProgress(userId, x.IndexedBookId)));
         }
     }
 }

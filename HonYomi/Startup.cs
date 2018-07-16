@@ -39,6 +39,7 @@ namespace HonYomi
                                                                  options.Password.RequiredUniqueChars = 5;
                                                              }).AddEntityFrameworkStores<HonyomiContext>()
                     .AddDefaultTokenProviders();
+            services.AddTransient<UserManager<IdentityUser>>();
             /***JWT config***/
             //clear defaults
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -67,7 +68,7 @@ namespace HonYomi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, HonyomiContext dbContext)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, HonyomiContext dbContext, UserManager<IdentityUser> uMan)
         {
             if (env.IsDevelopment())
             {
@@ -82,7 +83,7 @@ namespace HonYomi
             //true if database had to be created
             if (dbContext.Database.EnsureCreated())
             {
-                dbContext.CreateDefaults();
+                dbContext.CreateDefaults(uMan).Wait();
             }
             HonyomiConfig config = dbContext.Configs.First();
                 port = config.ServerPort;
