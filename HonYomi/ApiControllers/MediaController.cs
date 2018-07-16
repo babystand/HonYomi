@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using DataLib;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace HonYomi.ApiControllers
@@ -13,12 +15,13 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize]
         [Route("/api/getfile/{id}")]
-        public FileStreamResult GetAudioFile(Guid id)
+        //accepts byte range headers
+        public async Task<FileStreamResult> GetAudioFile(Guid id)
         {
             string path, mimeType;
             using (var db = new HonyomiContext())
             {
-                var file = db.Files.First(x => x.IndexedFileId == id);
+                var file = await db.Files.FirstAsync(x => x.IndexedFileId == id);
                 path = file.FilePath;
                 mimeType = file.MimeType;
             }
@@ -28,14 +31,14 @@ namespace HonYomi.ApiControllers
 
         [HttpGet]
         [Authorize]
-        [Route("/api/trackprogress/get/{userId}/{trackId}")]
-        public IActionResult GetTrackProgress(string userId, Guid trackId)
+        [Route("/api/track/progress/get/{userId}/{trackId}")]
+        public async Task<IActionResult> GetTrackProgress(string userId, Guid trackId)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
-                    return Json(db.GetUserFileProgress(userId, trackId));
+                    return Json(await db.GetUserFileProgress(userId, trackId));
                 }
             }
             catch (Exception)
@@ -45,25 +48,26 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
-        [Route("/api/trackprogress/set/{userId}/{trackId}/{seconds}")]
-        public IActionResult SetTrackProgress(string userId, Guid trackId, uint seconds)
+        [Authorize]
+        [Route("/api/track/progress/set/{userId}/{trackId}/{seconds}")]
+        public async Task<IActionResult> SetTrackProgress(string userId, Guid trackId, uint seconds)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
                     FileProgress prog =
-                        db.FileProgresses.SingleOrDefault(x => x.UserId == userId && x.FileId == trackId);
+                       await db.FileProgresses.SingleOrDefaultAsync(x => x.UserId == userId && x.FileId == trackId);
                     if (prog == null)
                     {
-                        db.FileProgresses.Add(
+                        await db.FileProgresses.AddAsync(
                             new FileProgress {FileId = trackId, UserId = userId, Progress = seconds});
-                        db.SaveChanges();
+                        await db.SaveChangesAsync();
                     }
                     else
                     {
                         prog.Progress = seconds;
-                        db.SaveChanges();
+                       await  db.SaveChangesAsync();
                     }
 
                     return Ok();

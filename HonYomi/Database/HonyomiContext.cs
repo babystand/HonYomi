@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using HonYomi.Core;
 using HonYomi.Exposed;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -36,18 +37,18 @@ namespace DataLib
 
     
 
-        public void CreateDefaults()
+        public async Task CreateDefaults()
         {
 //            Users.Add(new HonyomiUser {Username = "admin", HashedPass = "9BC7AA55F08FDAD935C3F8362D3F48BCF70EB280", HashSalt = "salt", IsAdmin = true});
-            Configs.Add(new HonyomiConfig{ScanInterval = 59, ServerPort = 5367, WatchForChanges = false});
-            SaveChanges();
+            await Configs.AddAsync(new HonyomiConfig{ScanInterval = 59, ServerPort = 5367, WatchForChanges = false});
+            await SaveChangesAsync();
         }
 
-        internal void InsertNewBooks(IEnumerable<ScannedBook> books)
+        internal async Task InsertNewBooks(IEnumerable<ScannedBook> books)
         {
             foreach (ScannedBook book in books)
             {
-                if (!Books.Any(x => x.DirectoryPath == book.Path))
+                if (!await Books.AnyAsync(x => x.DirectoryPath == book.Path))
                 {
                     var files = book.Files.Select(x => new IndexedFile()
                     {
@@ -57,11 +58,11 @@ namespace DataLib
                         FilePath   = x.Path,
                         MimeType = x.MimeType
                     }).ToList();
-                    Books.Add(new IndexedBook() {DirectoryPath = book.Path, Files = files, Title = book.Name});
+                    await Books.AddAsync(new IndexedBook() {DirectoryPath = book.Path, Files = files, Title = book.Name});
                 }
             }
 
-            SaveChanges();
+            await SaveChangesAsync();
         }
 
         public void RemoveMissing()
@@ -103,9 +104,14 @@ namespace DataLib
 
         }
 
-        public FileWithProgress GetUserFileProgress(string userId, Guid fileId)
+        public async Task<FileWithProgress> GetUserFileProgress(string userId, Guid fileId)
         {
-            IndexedFile file = Files.Include(x => x.Book).Single(x => x.IndexedFileId == fileId);
+            IndexedFile file = await Files.Include(x => x.Book).SingleOrDefaultAsync(x => x.IndexedFileId == fileId);
+            if (file == null)
+            {
+                //bail when such a file does not exist
+                return null;
+            }
             FileWithProgress result = new FileWithProgress
             {
                 Guid      = fileId,
@@ -113,7 +119,7 @@ namespace DataLib
                 BookGuid  = file.BookId,
                 BookTitle = file.Book.Title
             };
-            FileProgress fProg = FileProgresses.SingleOrDefault(x => x.FileId == fileId && x.UserId == userId);
+            FileProgress fProg = await FileProgresses.SingleOrDefaultAsync(x => x.FileId == fileId && x.UserId == userId);
             if (fProg == null)
                 result.ProgressSeconds = 0;
             else
@@ -121,15 +127,18 @@ namespace DataLib
             return result;
         }
 
-        public BookWithProgress GetUserBookProgress(string userId, Guid bookId)
+        public async Task<BookWithProgress> GetUserBookProgress(string userId, Guid bookId)
         {
-            IndexedBook book = Books.Include(x => x.Files).Single(x => x.IndexedBookId == bookId);
-            
+            IndexedBook book = await Books.Include(x => x.Files).SingleAsync(x => x.IndexedBookId == bookId);
+            if (book == null)
+            {
+                return null;
+            }
             BookProgress bookp = 
-                BookProgresses.SingleOrDefault(x => x.BookId == bookId && x.UserId == userId);
+                await BookProgresses.SingleOrDefaultAsync(x => x.BookId == bookId && x.UserId == userId);
             BookWithProgress result = new BookWithProgress
             {
-                FileProgresses   = book.Files.Select(x => GetUserFileProgress(userId, x.IndexedFileId)).ToArray(),
+                FileProgresses   = await Task.WhenAll(book.Files.Select(async x => await GetUserFileProgress(userId, x.IndexedFileId))),
                 Guid             = book.IndexedBookId,
                 CurrentTrackGuid = bookp?.FileId ?? book.Files.First().IndexedFileId,
                 Title            = book.Title
@@ -137,9 +146,45 @@ namespace DataLib
             return result;
         }
 
-        public BookWithProgress[] GetUserBooks(string userId)
+        public async Task AdvanceBookProgress(string userId, Guid bookId)
         {
-            return Books.Select(x => GetUserBookProgress(userId, x.IndexedBookId)).ToArray();
+            BookProgress progress = await BookProgresses.Include(x => x.Book).ThenInclude(x => x.Files).Include(x => x.File)
+                                                  .SingleOrDefaultAsync(x => x.BookId == bookId && x.UserId == userId);
+            //Initialize if missing
+            if (progress == null)
+            {
+                IndexedBook book = await Books.Include(x => x.Files).SingleOrDefaultAsync(x => x.IndexedBookId == bookId);
+                if (book == null)
+                {
+                    //bail when we can't create a bookprogress for a book that doesn't exist
+                    return;
+                }
+
+                await BookProgresses.AddAsync(new BookProgress()
+                                   {
+                                       Book   = book,
+                                       File   = book.Files.OrderBy(x => x.TrackIndex).First(),
+                                       UserId = userId
+                                   });
+                await SaveChangesAsync();
+                return;
+            }
+            var nextIndex = progress.File?.TrackIndex + 1 ?? 0;
+            IndexedFile nextFile =  progress.Book.Files.SingleOrDefault(x => x.TrackIndex == nextIndex);
+            if (nextFile == null)
+            {
+                //if there is no next file, bail
+                return;
+            }
+
+            progress.File = nextFile;
+            await SaveChangesAsync();
+
+        }
+
+        public async Task<BookWithProgress[]> GetUserBooks(string userId)
+        {
+            return  await Task.WhenAll(Books.Select(async x =>  await GetUserBookProgress(userId, x.IndexedBookId)));
         }
     }
 }
