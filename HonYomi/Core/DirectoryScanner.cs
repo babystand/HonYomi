@@ -46,15 +46,15 @@ namespace HonYomi.Core
                 case ".aac": return "audio/aac";
                 case ".mp4":
                 case ".m4a": return "audio/mp4";
+                case ".ogg":
+                case ".oga": return "audio/ogg";
+                case ".wav":  return "audio/wav";
+                case ".webm": return "audio/webm";
                 case ".mp1":
                 case ".mp2":
                 case ".mp3":
                 case ".mpg":
                 case ".mpeg": return "audio/mpeg";
-                case ".ogg":
-                case ".oga": return "audio/ogg";
-                case ".wav":  return "audio/wav";
-                case ".webm": return "audio/webm";
                 default:      return "audio/mpeg";
             }
         }

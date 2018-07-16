@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,8 +41,9 @@ namespace HonYomi.ApiControllers
         
         //todo: disable for production
         [HttpPost]
+        [Authorize]
         [Route("/api/account/register")]
-        public async Task<object> Register([FromBody] RegisterDto model)
+        public async Task<IActionResult> Register([FromBody] RegisterDto model)
         {
             var user = new IdentityUser
                        {
@@ -51,8 +53,7 @@ namespace HonYomi.ApiControllers
 
             if (result.Succeeded)
             {
-                await signInManager.SignInAsync(user, false);
-                return  GenerateJwtToken(model.Username, user);
+                return Ok();
             }
             
             throw new ApplicationException("UNKNOWN_ERROR");

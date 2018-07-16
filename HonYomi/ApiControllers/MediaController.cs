@@ -14,7 +14,7 @@ namespace HonYomi.ApiControllers
     {
         [HttpGet]
         [Authorize]
-        [Route("/api/getfile/{id}")]
+        [Route("/api/tracks/stream/{id}")]
         //accepts byte range headers
         public async Task<FileStreamResult> GetAudioFile(Guid id)
         {
@@ -49,7 +49,7 @@ namespace HonYomi.ApiControllers
 
         [HttpGet]
         [Authorize]
-        [Route("/api/track/progress/set/{userId}/{trackId}/{seconds}")]
+        [Route("/api/tracks/progress/set/{userId}/{trackId}/{seconds}")]
         public async Task<IActionResult> SetTrackProgress(string userId, Guid trackId, uint seconds)
         {
             try

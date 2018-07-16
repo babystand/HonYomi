@@ -63,5 +63,23 @@ namespace HonYomi.ApiControllers
                 return BadRequest();
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("/api/books/get/{userId}/{bookId}")]
+        public async Task<IActionResult> GetBookForUser(Guid bookId, string userId)
+        {
+            try
+            {
+                using (var db = new HonyomiContext())
+                {
+                    return Json(await db.GetUserBookProgress(userId, bookId));
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

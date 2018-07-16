@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Database\" />
+    <Folder Include="wwwroot" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
   <ItemGroup>
@@ -11,5 +13,14 @@
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.5.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="elm-stuff\exact-dependencies.json" />
+    <_ContentIncludedByDefault Remove="elm-stuff\packages\elm-lang\core\5.1.1\elm-package.json" />
+    <_ContentIncludedByDefault Remove="elm-stuff\packages\elm-lang\core\5.1.1\tests\elm-package.json" />
+    <_ContentIncludedByDefault Remove="elm-stuff\packages\elm-lang\html\2.0.0\elm-package.json" />
+    <_ContentIncludedByDefault Remove="elm-stuff\packages\elm-lang\http\1.0.0\elm-package.json" />
+    <_ContentIncludedByDefault Remove="elm-stuff\packages\elm-lang\virtual-dom\2.0.4\elm-package.json" />
+    <_ContentIncludedByDefault Remove="elm-stuff\packages\elm-lang\virtual-dom\2.0.4\tests\elm-package.json" />
   </ItemGroup>
 </Project>

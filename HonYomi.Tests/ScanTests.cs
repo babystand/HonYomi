@@ -25,7 +25,7 @@ namespace HonYomi.Tests
             HonyomiContext.DeleteDatabase();
             using (var db = new HonyomiContext())
             {
-                db.InsertNewBooks(books);
+                db.InsertNewBooks(books).Wait();
                 Assert.AreEqual(3, db.Books.Count());
                 Assert.IsTrue(db.Books.Include(x => x.Files).Any(x => x.Title == "A1" && x.Files.Count == 2));
             }
