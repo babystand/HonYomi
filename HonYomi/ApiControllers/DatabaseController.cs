@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DataLib;
 using HonYomi.Core;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,14 +49,15 @@ namespace HonYomi.ApiControllers
         
         [HttpGet]
         [Authorize]
-        [Route("/api/books/list/{userId}")]
-        public async Task<IActionResult> GetBooksForUser(string userId)
+        [Route("/api/books/list")]
+        public async Task<IActionResult> GetBooksForUser()
         {
+            Console.WriteLine(  User.Identity.Name);
             try
             {
                 using (var db = new HonyomiContext())
                 {
-                    return Json(await db.GetUserBooks(userId));
+                    return Json(await db.GetUserBooks(User.Identity.Name));
                 }
             }
             catch (Exception)

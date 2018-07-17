@@ -40,6 +40,7 @@ view model =
     div [] [ text <| toString model ]
 
 
+main : Program Never Model Msg
 main =
     Html.program
         { init = init

@@ -32,37 +32,44 @@ namespace HonYomi
             services.AddDbContext<HonyomiContext>();
             /***Identity***/
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
-                {
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequiredLength         = 8;
-                    options.Password.RequireUppercase       = true;
-                    options.Password.RequireLowercase       = true;
-                    options.Password.RequireDigit           = false;
-                    options.Password.RequiredUniqueChars    = 5;
-                }).AddEntityFrameworkStores<HonyomiContext>()
-                .AddDefaultTokenProviders();
+                                                             {
+                                                                 options.Password.RequireNonAlphanumeric = false;
+                                                                 options.Password.RequiredLength         = 8;
+                                                                 options.Password.RequireUppercase       = true;
+                                                                 options.Password.RequireLowercase       = true;
+                                                                 options.Password.RequireDigit           = false;
+                                                                 options.Password.RequiredUniqueChars    = 5;
+                                                             }).AddEntityFrameworkStores<HonyomiContext>()
+                    .AddDefaultTokenProviders();
             services.AddTransient<UserManager<IdentityUser>>();
             /***JWT config***/
             //clear defaults
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme             = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(cfg =>
-            {
-                cfg.RequireHttpsMetadata = false;
-                cfg.SaveToken            = true;
-                cfg.TokenValidationParameters =
-                    new TokenValidationParameters()
-                    {
-//                                                                   ValidIssuer      = "ISSUER",
-//                                                                   ValidAudience    = "ISSUER",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("key")),
-                        ClockSkew        = TimeSpan.Zero
-                    };
-            });
+                                       {
+                                           options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                                           options.DefaultChallengeScheme    = JwtBearerDefaults.AuthenticationScheme;
+                                       }).AddJwtBearer(cfg =>
+                                                       {
+                                                           cfg.ClaimsIssuer         = RuntimeConstants.JwtIssuer;
+                                                           cfg.RequireHttpsMetadata = false;
+                                                           cfg.SaveToken            = true;
+
+                                                           cfg.TokenValidationParameters =
+                                                               new TokenValidationParameters()
+                                                               {
+
+                                                                   ValidIssuer   = RuntimeConstants.JwtIssuer,
+                                                                   ValidAudience = RuntimeConstants.JwtIssuer,
+                                                                   IssuerSigningKey =
+                                                                       new
+                                                                           SymmetricSecurityKey(Encoding
+                                                                                                .UTF8
+                                                                                                .GetBytes(RuntimeConstants.JwtKey)),
+                                                                   ClockSkew = TimeSpan.FromMinutes(5)
+                                                               };
+                                                       });
+            services.AddAuthorization();
             /***MVC***/
             services.AddMvc();
             /***Scheduled Background Tasks (Hangfire)***/
@@ -70,8 +77,8 @@ namespace HonYomi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, HonyomiContext dbContext,
-            UserManager<IdentityUser>             uMan)
+        public void Configure(IApplicationBuilder       app, IHostingEnvironment env, HonyomiContext dbContext,
+                              UserManager<IdentityUser> uMan)
         {
             if (env.IsDevelopment())
             {
@@ -81,14 +88,18 @@ namespace HonYomi
             /***MVC***/
             app.UseMvc();
 
+            /***Authentication  ***/
+            app.UseAuthentication();
+
             /***Configure static files at root address "ui" instead of "wwwroot/dist" ***/
             app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider =
-                    new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "dist")),
-                RequestPath = "/ui"
-            });
-            
+                               {
+                                   FileProvider =
+                                       new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot",
+                                                                             "dist")),
+                                   RequestPath = "/ui"
+                               });
+
             /***Add Hangfire for Background tasks***/
             app.UseHangfireDashboard();
             app.UseHangfireServer();

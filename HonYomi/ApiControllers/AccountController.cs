@@ -72,8 +72,8 @@ namespace HonYomi.ApiControllers
             var expires = DateTime.Now.AddDays(Convert.ToDouble(30));
 
             var token = new JwtSecurityToken(
-                                             null,
-                                             null,
+                                             RuntimeConstants.JwtIssuer,
+                                             RuntimeConstants.JwtIssuer,
                                              claims,
                                              expires: expires,
                                              signingCredentials: creds
