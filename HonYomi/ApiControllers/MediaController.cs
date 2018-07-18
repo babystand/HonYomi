@@ -31,14 +31,14 @@ namespace HonYomi.ApiControllers
 
         [HttpGet]
         [Authorize]
-        [Route("/api/tracks/progress/get/{userId}/{trackId}")]
-        public async Task<IActionResult> GetTrackProgress(string userId, Guid trackId)
+        [Route("/api/tracks/progress/get/{trackId}")]
+        public async Task<IActionResult> GetTrackProgress(Guid trackId)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
-                    return Json(await db.GetUserFileProgress(userId, trackId));
+                    return Json(await db.GetUserFileProgress(User.Identity.Name, trackId));
                 }
             }
             catch (Exception)
@@ -49,19 +49,19 @@ namespace HonYomi.ApiControllers
 
         [HttpGet]
         [Authorize]
-        [Route("/api/tracks/progress/set/{userId}/{trackId}/{seconds}")]
-        public async Task<IActionResult> SetTrackProgress(string userId, Guid trackId, uint seconds)
+        [Route("/api/tracks/progress/set/{trackId}/{seconds}")]
+        public async Task<IActionResult> SetTrackProgress(Guid trackId, uint seconds)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
                     FileProgress prog =
-                       await db.FileProgresses.SingleOrDefaultAsync(x => x.UserId == userId && x.FileId == trackId);
+                       await db.FileProgresses.SingleOrDefaultAsync(x => x.UserId == User.Identity.Name && x.FileId == trackId);
                     if (prog == null)
                     {
                         await db.FileProgresses.AddAsync(
-                            new FileProgress {FileId = trackId, UserId = userId, Progress = seconds});
+                            new FileProgress {FileId = trackId, UserId = User.Identity.Name, Progress = seconds});
                         await db.SaveChangesAsync();
                     }
                     else

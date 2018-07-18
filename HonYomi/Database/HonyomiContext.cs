@@ -45,6 +45,9 @@ namespace DataLib
             await Configs.AddAsync(new HonyomiConfig{ScanInterval = 59, ServerPort = 5367, WatchForChanges = false});
             await SaveChangesAsync();
         }
+        public async Task<HonyomiConfig> GetConfig(){
+            return await Configs.FirstAsync();
+        }
 
         internal async Task InsertNewBooks(IEnumerable<ScannedBook> books)
         {

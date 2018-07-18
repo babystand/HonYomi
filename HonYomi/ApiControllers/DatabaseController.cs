@@ -5,12 +5,20 @@ using HonYomi.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace HonYomi.ApiControllers
 {
     [ApiController]
     public class DatabaseController : Controller
     {
+        private HonyomiContext db;
+        public DatabaseController(HonyomiContext dbcontext)
+        {
+            db = dbcontext;
+        }
+
         [HttpGet]
         [Authorize]
         [Route("/api/db/clean")]
@@ -46,13 +54,13 @@ namespace HonYomi.ApiControllers
             }
         }
 
-        
+
         [HttpGet]
         [Authorize]
         [Route("/api/books/list")]
         public async Task<IActionResult> GetBooksForUser()
         {
-            Console.WriteLine(  User.Identity.Name);
+            Console.WriteLine(User.Identity.Name);
             try
             {
                 using (var db = new HonyomiContext())
@@ -66,16 +74,60 @@ namespace HonYomi.ApiControllers
             }
         }
 
+        [HttpPost, Authorize, Route("/api/db/directories/add")]
+        public async Task<IActionResult> AddWatchDirectory([FromBody] string[] paths)
+        {
+            try
+            {
+                foreach (string path in paths)
+                {
+                    await db.WatchDirectories.AddAsync(new WatchDirectory { Path = path, Config = await db.GetConfig() });
+                }
+
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+        }
+        [HttpPost, Authorize, Route("/api/db/directories/remove")]
+        public async Task<IActionResult> RemoveWatchDirectory([FromBody] string[] paths)
+        {
+            try
+            {
+                foreach (string path in paths)
+                {
+                    var wdRecord = await db.WatchDirectories.FirstOrDefaultAsync(x => x.Path == path);
+                    if (wdRecord == null)
+                    {
+                        continue;
+                    }
+                    db.WatchDirectories.Remove(wdRecord);
+                }
+
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+        }
+
         [HttpGet]
         [Authorize]
-        [Route("/api/books/get/{userId}/{bookId}")]
-        public async Task<IActionResult> GetBookForUser(Guid bookId, string userId)
+        [Route("/api/books/get/{bookId}")]
+        public async Task<IActionResult> GetBookForUser(Guid bookId)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
-                    return Json(await db.GetUserBookProgress(userId, bookId));
+                    return Json(await db.GetUserBookProgress(User.Identity.Name, bookId));
                 }
             }
             catch (Exception)
