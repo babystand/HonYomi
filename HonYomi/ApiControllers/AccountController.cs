@@ -28,7 +28,7 @@ namespace HonYomi.ApiControllers
 
         [HttpPost]
         [Route("/api/account/login")]
-        public async Task<object> Login([FromBody] LoginDto model)
+        public async Task<object> Login([FromBody] UserCreds model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
             if (result.Succeeded)
@@ -43,7 +43,7 @@ namespace HonYomi.ApiControllers
         [HttpPost]
         [Authorize]
         [Route("/api/account/register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto model)
+        public async Task<IActionResult> Register([FromBody] UserCreds model)
         {
             var user = new IdentityUser
                        {
@@ -81,7 +81,7 @@ namespace HonYomi.ApiControllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public class LoginDto
+        public class UserCreds
         {
             [Required]
             public string Username { get; set; }
@@ -91,14 +91,5 @@ namespace HonYomi.ApiControllers
 
         }
         
-        public class RegisterDto
-        {
-            [Required]
-            public string Username { get; set; }
-
-            [Required]
-            [StringLength(100, ErrorMessage = "PASSWORD_MIN_LENGTH", MinimumLength = 8)]
-            public string Password { get; set; }
-        }
     }
 }
