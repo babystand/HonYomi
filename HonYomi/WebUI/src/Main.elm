@@ -3,41 +3,47 @@ module Main exposing (main)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import LoginPage exposing (..)
 
 
-type alias Page =
-    Int
+type Page
+    = PageLogin LoginPage.Model
+    | Home
 
 
-type alias User =
-    { username : String
-    , token : String
-    }
-
-
-type alias Model =
-    Int
+type Model
+    = Unauthenticated Page
+    | Authenticated Page String
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( 0, Cmd.none )
+    ( Unauthenticated (PageLogin LoginPage.init), Cmd.none )
 
 
 type Msg
-    = Inc
+    = LoginMsg LoginPage.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        Inc ->
-            ( model + 1, Cmd.none )
+        LoginMsg x ->
+            case x of
+                LoggedIn tok ->
+                    Authenticated Home tok
+
+                _ ->
+                    case model of
+                        Unauthenticated p ->
+                            Unauthenticated ()
 
 
 view : Model -> Html Msg
 view model =
-    div [] [ text <| toString model ]
+    case model of
+        PageLogin x ->
+            LoginPage.view x
 
 
 main : Program Never Model Msg

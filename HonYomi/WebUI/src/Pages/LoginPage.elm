@@ -3,8 +3,8 @@ module LoginPage exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Json.Decode
 import Http
+import Json.Decode
 import UserCreds
 
 
@@ -21,6 +21,11 @@ type Msg
     | LoginFailed
 
 
+init : Model
+init =
+    { user = { username = "", password = "" } }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -32,7 +37,7 @@ update msg model =
                 newUser =
                     { oldUser | username = x }
             in
-                ( { model | user = newUser }, Cmd.none )
+            ( { model | user = newUser }, Cmd.none )
 
         ChangePassword x ->
             let
@@ -42,7 +47,7 @@ update msg model =
                 newUser =
                     { oldUser | password = x }
             in
-                ( { model | user = newUser }, Cmd.none )
+            ( { model | user = newUser }, Cmd.none )
 
         LoginResponse (Ok tok) ->
             update (LoggedIn tok) model
@@ -69,15 +74,20 @@ submit model =
         body =
             Http.jsonBody (UserCreds.encodeUserCreds model.user)
     in
-        Http.send LoginResponse <| Http.post url body Json.Decode.string
+    Http.send LoginResponse <| Http.post url body Json.Decode.string
+
+
+view : Model -> Html Msg
+view model =
+    viewForm
 
 
 viewForm : Html Msg
 viewForm =
     Html.form [ onSubmit Submit ]
         [ div []
-            [ Html.input [ type_ "text", placeholder "Username" ] []
-            , Html.input [ type_ "password", placeholder "Password" ] []
+            [ Html.input [ type_ "text", placeholder "Username", onInput ChangeUsername ] []
+            , Html.input [ type_ "password", placeholder "Password", onInput ChangePassword ] []
             , Html.button [ class "btn", type_ "submit" ] [ text "Sign In" ]
             ]
         ]

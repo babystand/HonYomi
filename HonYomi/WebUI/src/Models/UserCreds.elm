@@ -1,8 +1,8 @@
 module UserCreds exposing (UserCreds, encodeUserCreds)
 
+import Json.Decode exposing (Decoder, float, int, string)
+import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required)
 import Json.Encode exposing (object)
-import Json.Decode exposing (int, string, float, Decoder)
-import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 
 
 type alias UserCreds =
@@ -14,8 +14,8 @@ type alias UserCreds =
 decodeUserCreds : Decoder UserCreds
 decodeUserCreds =
     decode UserCreds
-        |> required "username" (string)
-        |> required "password" (string)
+        |> required "username" string
+        |> required "password" string
 
 
 encodeUserCreds : UserCreds -> Json.Encode.Value
