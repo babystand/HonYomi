@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
@@ -72,6 +73,11 @@ namespace HonYomi
             services.AddAuthorization();
             /***MVC***/
             services.AddMvc();
+            /***spa***/
+            services.AddSpaStaticFiles(configuration =>
+                                       {
+                                           configuration.RootPath = "WebUI/build";
+                                       });
             /***Scheduled Background Tasks (Hangfire)***/
             services.AddHangfire(x => x.UseMemoryStorage());
         }
@@ -90,19 +96,22 @@ namespace HonYomi
 
             /***Authentication  ***/
             app.UseAuthentication();
-
-            /***Configure static files at root address "ui" instead of "wwwroot/dist" ***/
-            app.UseStaticFiles(new StaticFileOptions()
-                               {
-                                   FileProvider =
-                                       new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot",
-                                                                             "dist")),
-                                   RequestPath = "/ui"
-                               });
+            /***Spa file inclusion***/
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
 
             /***Add Hangfire for Background tasks***/
             app.UseHangfireDashboard();
             app.UseHangfireServer();
+            app.UseSpa(spa =>
+                       {
+                           spa.Options.SourcePath = "WebUI";
+
+                           if (env.IsDevelopment())
+                           {
+                               spa.UseReactDevelopmentServer(npmScript: "start");
+                           }
+                       });
 
             /***Create DB and populate defaults if needed***/
             if (dbContext.Database.EnsureCreated())
