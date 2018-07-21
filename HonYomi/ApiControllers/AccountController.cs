@@ -27,22 +27,28 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpPost]
-        [Route("/api/account/login")]
+        [Route("/api/auth/login")]
         public async Task<object> Login([FromBody] UserCreds model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
             if (result.Succeeded)
             {
                 var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == model.Username);
-                return GenerateJwtToken(model.Username, user);
+                return Json(GenerateJwtToken(model.Username, user));
             }
             throw new ApplicationException("Bad login");
+        }
+
+        [HttpPost, Authorize, Route("/api/auth/refresh")]
+        public async Task<object> Refresh(){
+            var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == User.Identity.Name);
+            return Json(GenerateJwtToken(User.Identity.Name, user));
         }
         
         //todo: disable for production
         [HttpPost]
         [Authorize]
-        [Route("/api/account/register")]
+        [Route("/api/auth/register")]
         public async Task<IActionResult> Register([FromBody] UserCreds model)
         {
             var user = new IdentityUser
@@ -58,13 +64,14 @@ namespace HonYomi.ApiControllers
             
             throw new ApplicationException("UNKNOWN_ERROR");
         }
-        private string GenerateJwtToken(string username, IdentityUser user)
+        private TokenResponse GenerateJwtToken(string username, IdentityUser user)
         {
             var claims = new List<Claim>
                          {
                              new Claim(JwtRegisteredClaimNames.Sub, username),
                              new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                             new Claim(ClaimTypes.NameIdentifier, user.Id)
+                             new Claim(ClaimTypes.NameIdentifier, user.Id),
+                             new Claim("user", user.Id)
                          };
 
             var key     = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(RuntimeConstants.JwtKey));
@@ -79,7 +86,7 @@ namespace HonYomi.ApiControllers
                                              signingCredentials: creds
                                             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new TokenResponse{ AuthToken = new JwtSecurityTokenHandler().WriteToken(token)};
         }
         public class UserCreds
         {
@@ -90,6 +97,8 @@ namespace HonYomi.ApiControllers
             public string Password { get; set; }
 
         }
-        
+        public class TokenResponse{
+            public string AuthToken { get; set; }
+        }
     }
 }
