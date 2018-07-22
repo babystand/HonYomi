@@ -1,11 +1,11 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import requiresLogin from './requires-login';
-import {fetchProtectedData} from '../actions/protected-data';
+import { fetchAllBooks } from '../actions/books';
 
 export class Dashboard extends React.Component {
     componentDidMount() {
-        this.props.dispatch(fetchProtectedData());
+        this.props.dispatch(fetchAllBooks());
     }
 
     render() {
@@ -16,7 +16,7 @@ export class Dashboard extends React.Component {
                 </div>
                 <div className="dashboard-name">Name: {this.props.name}</div>
                 <div className="dashboard-protected-data">
-                    Protected data: {this.props.protectedData}
+                    Books: {this.props.books}
                 </div>
             </div>
         );
@@ -27,7 +27,7 @@ const mapStateToProps = state => {
     const {currentUser} = state.auth;
     return {
         username: state.auth.currentUser,
-        protectedData: state.protectedData.data
+        books: state.books.data
     };
 };
 

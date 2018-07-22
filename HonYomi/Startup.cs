@@ -67,7 +67,7 @@ namespace HonYomi
                                                                            SymmetricSecurityKey(Encoding
                                                                                                 .UTF8
                                                                                                 .GetBytes(RuntimeConstants.JwtKey)),
-                                                                   ClockSkew = TimeSpan.FromMinutes(5)
+                                                                   ClockSkew = TimeSpan.FromMinutes(0)
                                                                };
                                                        });
             services.AddAuthorization();
