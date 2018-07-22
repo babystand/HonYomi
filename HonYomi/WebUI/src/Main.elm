@@ -3,12 +3,10 @@ module Main exposing (main)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import LoginPage exposing (..)
 
 
-type Page
-    = PageLogin LoginPage.Model
-    | Home
+type alias Page =
+    Int
 
 
 type Model
@@ -18,32 +16,22 @@ type Model
 
 init : ( Model, Cmd Msg )
 init =
-    ( Unauthenticated (PageLogin LoginPage.init), Cmd.none )
+    ( Unauthenticated 1, Cmd.none )
 
 
 type Msg
-    = LoginMsg LoginPage.Msg
+    = Start
+    | Stop
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
-    case message of
-        LoginMsg x ->
-            case x of
-                LoggedIn tok ->
-                    Authenticated Home tok
-
-                _ ->
-                    case model of
-                        Unauthenticated p ->
-                            Unauthenticated ()
+    ( model, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
-    case model of
-        PageLogin x ->
-            LoginPage.view x
+    div [] []
 
 
 main : Program Never Model Msg
