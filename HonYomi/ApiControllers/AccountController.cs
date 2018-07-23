@@ -27,7 +27,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpPost]
-        [Route("/api/account/login")]
+        [Route("/api/auth/login")]
         public async Task<object> Login([FromBody] UserCreds model)
         {
             var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
@@ -42,7 +42,7 @@ namespace HonYomi.ApiControllers
         //todo: disable for production
         [HttpPost]
         [Authorize]
-        [Route("/api/account/register")]
+        [Route("/api/auth/register")]
         public async Task<IActionResult> Register([FromBody] UserCreds model)
         {
             var user = new IdentityUser

@@ -5,6 +5,10 @@ import ServerFile
 import Json.Decode.Pipeline
 
 
+type alias Library =
+    List ServerBook
+
+
 type alias ServerBook =
     { guid : String
     , currentTrackGuid : String
