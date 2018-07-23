@@ -4,13 +4,13 @@
 module Requests exposing (..)
 
 import Http
-import Jwt
-import Result
-import Models
-import Messages as M
-import UserCreds as User
-import ServerBook
 import Json.Decode
+import Jwt
+import Messages as M
+import Models
+import Result
+import ServerBook
+import UserCreds as User
 
 
 mapAuthRequest : Result Http.Error String -> M.Msg
@@ -68,4 +68,6 @@ mapLibraryRequest result =
 
 libraryRequest : Models.Token -> Cmd M.Msg
 libraryRequest tok =
-    Http.send mapLibraryRequest <| Jwt.get tok "/api/books/list" (Json.Decode.list ServerBook.decodeServerBook)
+    Http.send mapLibraryRequest <|
+        Jwt.get tok "/api/books/list" <|
+            Json.Decode.list ServerBook.decodeServerBook
