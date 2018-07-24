@@ -4,6 +4,7 @@
 module Models exposing (..)
 
 import ServerBook
+import UserCreds exposing (UserCreds)
 
 
 type alias Token =
@@ -11,9 +12,7 @@ type alias Token =
 
 
 type alias LoginModel =
-    { username : String
-    , password : String
-    }
+    UserCreds
 
 
 type alias LibraryModel =
@@ -30,6 +29,21 @@ type Page
 type Model
     = Unauthorized Page
     | Authorized Token Page
+
+
+initLoginModel : LoginModel
+initLoginModel =
+    { username = "", password = "" }
+
+
+initLibraryModel : LibraryModel
+initLibraryModel =
+    { books = [], selectedBook = Nothing }
+
+
+initMainModel : Model
+initMainModel =
+    Unauthorized <| LoginPage initLoginModel
 
 
 getPage : Model -> Page

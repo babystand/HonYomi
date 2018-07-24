@@ -58,7 +58,7 @@ namespace HonYomi.ApiControllers
             
             throw new ApplicationException("UNKNOWN_ERROR");
         }
-        private string GenerateJwtToken(string username, IdentityUser user)
+        private TokenObject GenerateJwtToken(string username, IdentityUser user)
         {
             var claims = new List<Claim>
                          {
@@ -79,7 +79,13 @@ namespace HonYomi.ApiControllers
                                              signingCredentials: creds
                                             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return new TokenObject( new JwtSecurityTokenHandler().WriteToken(token));
+        }
+        public class TokenObject{
+            public string Token { get; set; }
+            public TokenObject(string tok){
+                Token = tok;
+            }
         }
         public class UserCreds
         {

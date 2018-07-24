@@ -9,6 +9,7 @@
     "start": "npm run dev",
     "dev": "webpack-serve --hot --port 3000 --colors",
     "build": "webpack",
+    "watch": "webpack --watch",
     "prod": "webpack -p",
     "postinstall": "elm-package install -y && elm-test init"
   },

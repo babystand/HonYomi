@@ -95,9 +95,7 @@ namespace HonYomi
             app.UseStaticFiles(new StaticFileOptions()
                                {
                                    FileProvider =
-                                       new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot",
-                                                                             "dist")),
-                                   RequestPath = "/ui"
+                                       new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"))
                                });
 
             /***Add Hangfire for Background tasks***/

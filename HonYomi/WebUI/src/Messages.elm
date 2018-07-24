@@ -3,15 +3,15 @@
 
 module Messages exposing (..)
 
-import UserCreds as User
-import ServerBook as Book
 import Models
+import ServerBook as Book
+import UserCreds as User
 
 
 type AuthMsg
     = SetUsernameField String
     | SetPasswordField String
-    | LoginRequest User.UserCreds
+    | LoginRequest
     | LoginSuccess Models.Token
     | LoginFailure String
 

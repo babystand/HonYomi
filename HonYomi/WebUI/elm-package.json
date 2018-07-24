@@ -5,7 +5,7 @@
     "license": "MIT",
     "source-directories": [
         "src",
-        "src/Models",
+        "src/JsonModels",
         "src/Pages"
     ],
     "exposed-modules": [],

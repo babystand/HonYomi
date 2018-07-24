@@ -5,19 +5,20 @@ module Requests exposing (..)
 
 import Http
 import Json.Decode
+import JsonToken exposing (..)
 import Jwt
 import Messages as M
 import Models
 import Result
 import ServerBook
-import UserCreds as User
+import UserCreds as User exposing (encodeUserCreds)
 
 
-mapAuthRequest : Result Http.Error String -> M.Msg
+mapAuthRequest : Result Http.Error JsonToken -> M.Msg
 mapAuthRequest result =
-    case result of
+    case Debug.log "result" result of
         Ok s ->
-            M.Auth <| M.LoginSuccess s
+            M.Auth <| M.LoginSuccess s.token
 
         Err err ->
             case err of
@@ -39,7 +40,7 @@ mapAuthRequest result =
 
 authRequest : User.UserCreds -> Cmd M.Msg
 authRequest user =
-    Http.send mapAuthRequest <| Http.getString "/api/auth/login"
+    Http.send mapAuthRequest <| Http.post "/api/auth/login" (Http.jsonBody <| encodeUserCreds user) decodeJsonToken
 
 
 mapLibraryRequest : Result Http.Error ServerBook.Library -> M.Msg
