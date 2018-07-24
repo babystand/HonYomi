@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using HonYomi.Exposed;
 using Microsoft.EntityFrameworkCore;
 
 namespace HonYomi.ApiControllers
@@ -73,6 +74,28 @@ namespace HonYomi.ApiControllers
                 return BadRequest();
             }
         }
+                [HttpGet]
+                [Authorize]
+                [Route("/api/books/list/fake")]
+                public async Task<IActionResult> GetBooksForUserFake()
+                {
+                    Console.WriteLine(User.Identity.Name);
+                    try
+                    {
+                        using (var db = new HonyomiContext())
+                        {
+                            var bookGuid = Guid.NewGuid();
+                            var file1id = Guid.NewGuid();
+                            var file2id = Guid.NewGuid();
+                            var book = new BookWithProgress(){Guid = bookGuid, CurrentTrackGuid = file1id, FileProgresses = new []{new FileWithProgress(){BookGuid = bookGuid, BookTitle = "Book Title", Guid = file1id,ProgressSeconds = 5, Title = "track 1"}, new FileWithProgress(){BookGuid = bookGuid, BookTitle = "Book Title", Guid = file2id,ProgressSeconds = 66, Title = "track 2"}}};
+                            return Json(new[]{book});
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return BadRequest();
+                    }
+                }
 
         [HttpPost, Authorize, Route("/api/db/directories/add")]
         public async Task<IActionResult> AddWatchDirectory([FromBody] string[] paths)
