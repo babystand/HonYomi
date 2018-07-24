@@ -28,6 +28,11 @@ namespace HonYomi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //delete db for debugging
+
+            if (File.Exists(RuntimeConstants.DatabaseLocation))
+                File.Delete(RuntimeConstants.DatabaseLocation);
+
             /***EF Core***/
             services.AddDbContext<HonyomiContext>();
             /***Identity***/
@@ -58,14 +63,14 @@ namespace HonYomi
                                                            cfg.TokenValidationParameters =
                                                                new TokenValidationParameters()
                                                                {
-
                                                                    ValidIssuer   = RuntimeConstants.JwtIssuer,
                                                                    ValidAudience = RuntimeConstants.JwtIssuer,
                                                                    IssuerSigningKey =
                                                                        new
                                                                            SymmetricSecurityKey(Encoding
                                                                                                 .UTF8
-                                                                                                .GetBytes(RuntimeConstants.JwtKey)),
+                                                                                                .GetBytes(RuntimeConstants
+                                                                                                              .JwtKey)),
                                                                    ClockSkew = TimeSpan.FromMinutes(5)
                                                                };
                                                        });
@@ -95,7 +100,8 @@ namespace HonYomi
             app.UseStaticFiles(new StaticFileOptions()
                                {
                                    FileProvider =
-                                       new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"))
+                                       new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),
+                                                                             "wwwroot"))
                                });
 
             /***Add Hangfire for Background tasks***/
@@ -110,7 +116,20 @@ namespace HonYomi
 
             HonyomiConfig config = dbContext.Configs.First();
             port = config.ServerPort;
+            //debug scan path
+            if (env.IsDevelopment())
+            {
+                dbContext.WatchDirectories.Add(new WatchDirectory()
+                                               {
+                                                   ConfigId = config.HonyomiConfigId,
+                                                   Path = Path.Combine(Directory.GetCurrentDirectory(),
+                                                                       "..", "HonYomi.Tests",
+                                                                       "scanTestDir")
+                                               });
+                dbContext.SaveChanges();
+            }
 
+            DirectoryScanner.ScanWatchDirectories().Wait();
             RecurringJob.AddOrUpdate("scan", () => DirectoryScanner.ScanWatchDirectories(),
                                      Cron.MinuteInterval(config.ScanInterval));
         }

@@ -1,13 +1,14 @@
 module Main exposing (main)
 
 import Html exposing (..)
-import Html.Attributes exposing (id, placeholder, type_)
+import Html.Attributes exposing (checked, for, hidden, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
 import List exposing (map)
 import Messages exposing (..)
 import Models exposing (..)
 import Requests exposing (authRequest, libraryRequest, mapAuthRequest)
 import ServerBook exposing (ServerBook)
+import ServerConfig exposing (WatchDir)
 
 
 type alias Page =
@@ -83,6 +84,20 @@ update message model =
         ( Library libmsg, _ ) ->
             ( model, Cmd.none )
 
+        ( Config config, ConfigPage cpage ) ->
+            ( model, Cmd.none )
+
+        ( Config config, _ ) ->
+            ( model, Cmd.none )
+
+        ( Route route, _ ) ->
+            case route of
+                RouteToLibrary ->
+                    update (Library BooksRequest) (Authorized (getToken model) <| LibraryPage initLibraryModel)
+
+                RouteToConfig ->
+                    update (Config ConfigGetRequest) (Authorized (getToken model) <| ConfigPage initConfigModel)
+
 
 loginPageView : LoginModel -> Html Msg
 loginPageView loginModel =
@@ -109,6 +124,39 @@ libraryPageView libraryModel =
         ]
 
 
+watchDirView : WatchDir -> Html Msg
+watchDirView watchDir =
+    div []
+        [ span [ hidden True ] [ text watchDir.guid ]
+        , span [] [ text <| "path: " ++ watchDir.path ]
+        ]
+
+
+configPageView : ConfigModel -> Html Msg
+configPageView configModel =
+    div []
+        [ div [] [ text <| "scan interval: " ++ toString configModel.scanInterval ]
+        , div [] [ text <| "server port: " ++ toString configModel.serverPort ]
+        , label [ for "watchForChanges" ] [ text "watch for changes: " ]
+        , input [ id "watchForChanges", type_ "checkbox", checked configModel.watchForChanges ] []
+        , div [] (List.map watchDirView configModel.watchDirectories)
+        ]
+
+
+navLayoutView : String -> Html Msg -> Html Msg
+navLayoutView pagename child =
+    div []
+        [ div []
+            [ a [ onClick <| Route RouteToLibrary ] [ text " >>go to library<< " ]
+            , a [ onClick <| Route RouteToConfig ] [ text " >>go to config<< " ]
+            ]
+        , br [] []
+        , h2 [] [ text pagename ]
+        , br [] []
+        , div [] [ child ]
+        ]
+
+
 view : Model -> Html Msg
 view model =
     let
@@ -120,7 +168,10 @@ view model =
             loginPageView pmod
 
         LibraryPage pmod ->
-            libraryPageView pmod
+            navLayoutView "library" <| libraryPageView pmod
+
+        ConfigPage cmod ->
+            navLayoutView "config" <| configPageView cmod
 
 
 main : Program Never Model Msg

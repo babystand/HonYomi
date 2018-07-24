@@ -5,7 +5,7 @@ module Messages exposing (..)
 
 import Models
 import ServerBook as Book
-import UserCreds as User
+import ServerConfig exposing (ServerConfig)
 
 
 type AuthMsg
@@ -22,7 +22,24 @@ type LibraryMsg
     | BooksError String
 
 
+type ConfigMsg
+    = ConfigGetRequest
+    | ConfigPostRequest
+    | ConfigSuccess ServerConfig
+    | ConfigError String
+    | ToggleWatchForChanges
+    | SetScanInterval Int
+    | SetServerPort Int
+
+
+type RouteMsg
+    = RouteToLibrary
+    | RouteToConfig
+
+
 type Msg
     = NoOp
     | Auth AuthMsg
     | Library LibraryMsg
+    | Config ConfigMsg
+    | Route RouteMsg

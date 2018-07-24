@@ -27,11 +27,10 @@ namespace HonYomi.ApiControllers
         {
             try
             {
-                using (var db = new HonyomiContext())
-                {
+     
                     db.RemoveMissing();
                     return Ok();
-                }
+             
             }
             catch (Exception)
             {
@@ -64,10 +63,9 @@ namespace HonYomi.ApiControllers
             Console.WriteLine(User.Identity.Name);
             try
             {
-                using (var db = new HonyomiContext())
-                {
+        
                     return Json(await db.GetUserBooks(User.Identity.Name));
-                }
+               
             }
             catch (Exception)
             {
@@ -82,20 +80,58 @@ namespace HonYomi.ApiControllers
                     Console.WriteLine(User.Identity.Name);
                     try
                     {
-                        using (var db = new HonyomiContext())
-                        {
                             var bookGuid = Guid.NewGuid();
                             var file1id = Guid.NewGuid();
                             var file2id = Guid.NewGuid();
                             var book = new BookWithProgress(){Guid = bookGuid, CurrentTrackGuid = file1id, FileProgresses = new []{new FileWithProgress(){BookGuid = bookGuid, BookTitle = "Book Title", Guid = file1id,ProgressSeconds = 5, Title = "track 1"}, new FileWithProgress(){BookGuid = bookGuid, BookTitle = "Book Title", Guid = file2id,ProgressSeconds = 66, Title = "track 2"}}};
                             return Json(new[]{book});
-                        }
+                      
                     }
                     catch (Exception)
                     {
                         return BadRequest();
                     }
                 }
+
+        [HttpGet, Authorize, Route("/api/db/config")]
+        public async Task<IActionResult> GetConfig()
+        {
+            try
+            {
+                return Json(await db.GetConfigClient());
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+
+        [HttpPost, Authorize, Route("/api/db/config")]
+        public async Task<IActionResult> SetConfig([FromBody] ConfigClientModel model)
+        {
+            try
+            {
+                var config = await db.Configs.Include(x => x.WatchDirectories).FirstAsync();
+                config.ScanInterval    = model.ScanInterval;
+                config.ServerPort      = model.ServerPort;
+                config.WatchForChanges = model.WatchForChanges;
+                //todo: be smarter about upserting
+                foreach (WatchDirClientModel dir in model.WatchDirectories)
+                {
+                    if (config.WatchDirectories.All(x => x.Path != dir.Path))
+                    {
+                        db.WatchDirectories.Add(new WatchDirectory() {ConfigId = config.HonyomiConfigId, Path = dir.Path});
+                    }
+                }
+
+                await db.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
 
         [HttpPost, Authorize, Route("/api/db/directories/add")]
         public async Task<IActionResult> AddWatchDirectory([FromBody] string[] paths)
@@ -108,7 +144,7 @@ namespace HonYomi.ApiControllers
                 }
 
                 await db.SaveChangesAsync();
-                return Ok();
+                return Json(await db.GetConfigClient());
             }
             catch (Exception)
             {
@@ -132,7 +168,7 @@ namespace HonYomi.ApiControllers
                 }
 
                 await db.SaveChangesAsync();
-                return Ok();
+                return Json(await db.GetConfigClient());
             }
             catch (Exception)
             {
@@ -148,10 +184,9 @@ namespace HonYomi.ApiControllers
         {
             try
             {
-                using (var db = new HonyomiContext())
-                {
+              
                     return Json(await db.GetUserBookProgress(User.Identity.Name, bookId));
-                }
+                
             }
             catch (Exception)
             {

@@ -4,6 +4,7 @@
 module Models exposing (..)
 
 import ServerBook
+import ServerConfig exposing (ServerConfig)
 import UserCreds exposing (UserCreds)
 
 
@@ -21,9 +22,14 @@ type alias LibraryModel =
     }
 
 
+type alias ConfigModel =
+    ServerConfig
+
+
 type Page
     = LoginPage LoginModel
     | LibraryPage LibraryModel
+    | ConfigPage ConfigModel
 
 
 type Model
@@ -39,6 +45,11 @@ initLoginModel =
 initLibraryModel : LibraryModel
 initLibraryModel =
     { books = [], selectedBook = Nothing }
+
+
+initConfigModel : ConfigModel
+initConfigModel =
+    { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = [] }
 
 
 initMainModel : Model

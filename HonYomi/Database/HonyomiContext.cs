@@ -49,6 +49,12 @@ namespace DataLib
             return await Configs.FirstAsync();
         }
 
+        public async Task<ConfigClientModel> GetConfigClient()
+        {
+            var config = await Configs.Include(x => x.WatchDirectories).FirstAsync();
+            return new ConfigClientModel(config.WatchForChanges, config.ScanInterval, config.ServerPort, config.WatchDirectories.Select(x => new WatchDirClientModel(x.Path, x.WatchDirectoryId)).ToArray());
+        }
+
         internal async Task InsertNewBooks(IEnumerable<ScannedBook> books)
         {
             foreach (ScannedBook book in books)
