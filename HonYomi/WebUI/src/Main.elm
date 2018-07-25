@@ -1,15 +1,13 @@
 module Main exposing (main)
 
-import Array exposing (Array)
-import Exts.Html.Events exposing (onEnter)
+import ConfigView exposing (configPageView)
 import Html exposing (..)
-import Html.Attributes exposing (checked, for, hidden, id, placeholder, type_)
-import Html.Events exposing (onClick, onInput)
+import LayoutView exposing (..)
+import LibraryView exposing (libraryPageView)
+import LoginView exposing (loginPageView)
 import Messages exposing (..)
 import Models exposing (..)
 import Requests exposing (authRequest, libraryRequest, mapAuthRequest, refreshRequest)
-import ServerBook exposing (ServerBook)
-import ServerConfig exposing (WatchDir)
 
 
 type alias Page =
@@ -116,63 +114,20 @@ update message model =
                     update (Config ConfigGetRequest) (Authorized (getToken model) <| ConfigPage initConfigModel)
 
 
-loginPageView : LoginModel -> Html Msg
-loginPageView loginModel =
-    div [ id "login-section" ]
-        [ input [ id "username", placeholder "Username", onEnter (Auth LoginRequest), onInput (\x -> Auth (SetUsernameField x)) ] []
-        , input [ id "password", placeholder "Password", onEnter (Auth LoginRequest), type_ "password", onInput (\x -> Auth (SetPasswordField x)) ] []
-        , button [ type_ "submit", onClick (Auth LoginRequest) ] [ text "Submit" ]
-        ]
+getPageView : Model -> Html Msg
+getPageView model =
+    case model of
+        Unauthorized (LoginPage pmod) ->
+            loginPageView pmod
 
+        Authorized _ (LibraryPage pmod) ->
+            libraryPageView pmod
 
-bookView : ServerBook -> Html Msg
-bookView serverBook =
-    li [ id serverBook.guid ]
-        [ div [] [ text serverBook.guid ]
-        ]
+        Authorized _ (ConfigPage cmod) ->
+            configPageView cmod
 
-
-libraryPageView : LibraryModel -> Html Msg
-libraryPageView libraryModel =
-    div []
-        [ libraryModel.books
-            |> Array.map bookView
-            |> Array.toList
-            |> ul [ id "library-section" ]
-        ]
-
-
-watchDirView : WatchDir -> Html Msg
-watchDirView watchDir =
-    div []
-        [ span [ hidden True ] [ text watchDir.guid ]
-        , span [] [ text <| "path: " ++ watchDir.path ]
-        ]
-
-
-configPageView : ConfigModel -> Html Msg
-configPageView configModel =
-    div []
-        [ div [] [ text <| "scan interval: " ++ toString configModel.scanInterval ]
-        , div [] [ text <| "server port: " ++ toString configModel.serverPort ]
-        , label [ for "watchForChanges" ] [ text "watch for changes: " ]
-        , input [ id "watchForChanges", type_ "checkbox", checked configModel.watchForChanges ] []
-        , div [] (Array.toList <| Array.map watchDirView configModel.watchDirectories)
-        ]
-
-
-navLayoutView : String -> Html Msg -> Html Msg
-navLayoutView pagename child =
-    div []
-        [ div []
-            [ a [ onClick <| Route RouteToLibrary ] [ text " >>go to library<< " ]
-            , a [ onClick <| Route RouteToConfig ] [ text " >>go to config<< " ]
-            ]
-        , br [] []
-        , h2 [] [ text pagename ]
-        , br [] []
-        , div [] [ child ]
-        ]
+        _ ->
+            div [] [ text "The only way to get here is to be on a page without a view. I'm impressed " ]
 
 
 view : Model -> Html Msg
@@ -181,15 +136,7 @@ view model =
         page =
             getPage model
     in
-    case page of
-        LoginPage pmod ->
-            loginPageView pmod
-
-        LibraryPage pmod ->
-            navLayoutView "library" <| libraryPageView pmod
-
-        ConfigPage cmod ->
-            navLayoutView "config" <| configPageView cmod
+    applyLayout model <| getPageView model
 
 
 main : Program Never Model Msg
