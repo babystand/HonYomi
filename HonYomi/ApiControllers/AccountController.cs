@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +42,7 @@ namespace HonYomi.ApiControllers
         
         //todo: disable for production
         [HttpPost]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/auth/register")]
         public async Task<IActionResult> Register([FromBody] UserCreds model)
         {
@@ -58,7 +59,7 @@ namespace HonYomi.ApiControllers
             
             throw new ApplicationException("UNKNOWN_ERROR");
         }
-        [HttpGet, Authorize, Route("/api/auth/refresh")]
+        [HttpGet, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/auth/refresh")]
         public async Task<object> Refresh() {
             var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == User.Identity.Name);
             return Json(GenerateJwtToken(User.Identity.Name, user));
@@ -70,7 +71,7 @@ namespace HonYomi.ApiControllers
                          {
                              new Claim(JwtRegisteredClaimNames.Sub, username),
                              new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                             new Claim(ClaimTypes.NameIdentifier, user.Id)
+                             new Claim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", user.Id)
                          };
 
             var key     = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(RuntimeConstants.JwtKey));

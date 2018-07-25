@@ -195,6 +195,7 @@ namespace DataLib
 
         public async Task<BookWithProgress[]> GetUserBooks(string userId)
         {
+
             return  await Task.WhenAll(Books.Select( x =>   GetUserBookProgress(userId, x.IndexedBookId)));
         }
     }

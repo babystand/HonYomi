@@ -1,9 +1,10 @@
 module Main exposing (main)
 
+import Array exposing (Array)
+import Exts.Html.Events exposing (onEnter)
 import Html exposing (..)
 import Html.Attributes exposing (checked, for, hidden, id, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
-import List exposing (map)
 import Messages exposing (..)
 import Models exposing (..)
 import Requests exposing (authRequest, libraryRequest, mapAuthRequest, refreshRequest)
@@ -92,7 +93,7 @@ update message model =
                         newPage =
                             { lpage | books = bs }
                     in
-                    ( Authorized (getToken model) <| LibraryPage lpage, Cmd.none )
+                    ( Authorized (getToken model) <| LibraryPage newPage, Cmd.none )
 
                 Messages.BooksError _ ->
                     ( model, Cmd.none )
@@ -118,8 +119,8 @@ update message model =
 loginPageView : LoginModel -> Html Msg
 loginPageView loginModel =
     div [ id "login-section" ]
-        [ input [ id "username", placeholder "Username", onInput (\x -> Auth (SetUsernameField x)) ] []
-        , input [ id "password", placeholder "Password", type_ "password", onInput (\x -> Auth (SetPasswordField x)) ] []
+        [ input [ id "username", placeholder "Username", onEnter (Auth LoginRequest), onInput (\x -> Auth (SetUsernameField x)) ] []
+        , input [ id "password", placeholder "Password", onEnter (Auth LoginRequest), type_ "password", onInput (\x -> Auth (SetPasswordField x)) ] []
         , button [ type_ "submit", onClick (Auth LoginRequest) ] [ text "Submit" ]
         ]
 
@@ -135,7 +136,8 @@ libraryPageView : LibraryModel -> Html Msg
 libraryPageView libraryModel =
     div []
         [ libraryModel.books
-            |> List.map bookView
+            |> Array.map bookView
+            |> Array.toList
             |> ul [ id "library-section" ]
         ]
 
@@ -155,7 +157,7 @@ configPageView configModel =
         , div [] [ text <| "server port: " ++ toString configModel.serverPort ]
         , label [ for "watchForChanges" ] [ text "watch for changes: " ]
         , input [ id "watchForChanges", type_ "checkbox", checked configModel.watchForChanges ] []
-        , div [] (List.map watchDirView configModel.watchDirectories)
+        , div [] (Array.toList <| Array.map watchDirView configModel.watchDirectories)
         ]
 
 

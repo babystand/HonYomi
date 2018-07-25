@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DataLib;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ namespace HonYomi.ApiControllers
     public class MediaController : Controller
     {
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/stream/{id}")]
         //accepts byte range headers
         public async Task<FileStreamResult> GetAudioFile(Guid id)
@@ -30,7 +31,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/progress/get/{trackId}")]
         public async Task<IActionResult> GetTrackProgress(Guid trackId)
         {
@@ -48,7 +49,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/progress/set/{trackId}/{seconds}")]
         public async Task<IActionResult> SetTrackProgress(Guid trackId, uint seconds)
         {

@@ -103,7 +103,7 @@ libraryRequest : Models.Token -> Cmd M.Msg
 libraryRequest tok =
     Http.send mapLibraryRequest <|
         Jwt.get tok "/api/books/list/fake" <|
-            Json.Decode.list ServerBook.decodeServerBook
+            Json.Decode.array ServerBook.decodeServerBook
 
 
 mapConfigRequest : Result Http.Error ServerConfig.ServerConfig -> M.Msg

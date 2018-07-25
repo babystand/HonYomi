@@ -2,6 +2,7 @@ module ServerConfig exposing (..)
 
 -- elm-package install -- yes noredink/elm-decode-pipeline
 
+import Array exposing (Array)
 import Json.Decode
 import Json.Decode.Pipeline
 import Json.Encode
@@ -15,7 +16,7 @@ type alias ServerConfig =
     { watchForChanges : Bool
     , scanInterval : Int
     , serverPort : Int
-    , watchDirectories : List WatchDir
+    , watchDirectories : Array WatchDir
     }
 
 
@@ -40,7 +41,7 @@ decodeServerConfig =
         |> Json.Decode.Pipeline.required "watchForChanges" Json.Decode.bool
         |> Json.Decode.Pipeline.required "scanInterval" Json.Decode.int
         |> Json.Decode.Pipeline.required "serverPort" Json.Decode.int
-        |> Json.Decode.Pipeline.required "watchDirectories" (Json.Decode.list decodeWatchDir)
+        |> Json.Decode.Pipeline.required "watchDirectories" (Json.Decode.array decodeWatchDir)
 
 
 encodeServerConfig : ServerConfig -> Json.Encode.Value
@@ -49,5 +50,5 @@ encodeServerConfig record =
         [ ( "watchForChanges", Json.Encode.bool <| record.watchForChanges )
         , ( "scanInterval", Json.Encode.int <| record.scanInterval )
         , ( "serverPort", Json.Encode.int <| record.serverPort )
-        , ( "watchDirectories", Json.Encode.list <| List.map encodeWatchDir <| record.watchDirectories )
+        , ( "watchDirectories", Json.Encode.array <| Array.map encodeWatchDir <| record.watchDirectories )
         ]

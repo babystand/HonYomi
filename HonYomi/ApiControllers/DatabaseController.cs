@@ -21,7 +21,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/db/clean")]
         public IActionResult RemoveMissing()
         {
@@ -39,7 +39,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/db/scan")]
         public async Task<IActionResult> ScanNow()
         {
@@ -56,15 +56,15 @@ namespace HonYomi.ApiControllers
 
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/books/list")]
         public async Task<IActionResult> GetBooksForUser()
         {
             Console.WriteLine(User.Identity.Name);
             try
             {
-        
-                    return Json(await db.GetUserBooks(User.Identity.Name));
+                var result = await db.GetUserBooks(User.Identity.Name);
+                    return Json(result);
                
             }
             catch (Exception)
@@ -73,7 +73,7 @@ namespace HonYomi.ApiControllers
             }
         }
                 [HttpGet]
-                [Authorize]
+                [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
                 [Route("/api/books/list/fake")]
                 public async Task<IActionResult> GetBooksForUserFake()
                 {
@@ -93,7 +93,7 @@ namespace HonYomi.ApiControllers
                     }
                 }
 
-        [HttpGet, Authorize, Route("/api/db/config")]
+        [HttpGet, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/config")]
         public async Task<IActionResult> GetConfig()
         {
             try
@@ -106,7 +106,7 @@ namespace HonYomi.ApiControllers
             }
         }
 
-        [HttpPost, Authorize, Route("/api/db/config")]
+        [HttpPost, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/config")]
         public async Task<IActionResult> SetConfig([FromBody] ConfigClientModel model)
         {
             try
@@ -133,7 +133,7 @@ namespace HonYomi.ApiControllers
             }
         }
 
-        [HttpPost, Authorize, Route("/api/db/directories/add")]
+        [HttpPost, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/directories/add")]
         public async Task<IActionResult> AddWatchDirectory([FromBody] string[] paths)
         {
             try
@@ -152,7 +152,7 @@ namespace HonYomi.ApiControllers
             }
 
         }
-        [HttpPost, Authorize, Route("/api/db/directories/remove")]
+        [HttpPost, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/directories/remove")]
         public async Task<IActionResult> RemoveWatchDirectory([FromBody] string[] paths)
         {
             try
@@ -178,7 +178,7 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpGet]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/books/get/{bookId}")]
         public async Task<IActionResult> GetBookForUser(Guid bookId)
         {

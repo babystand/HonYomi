@@ -3,6 +3,7 @@
 
 module Models exposing (..)
 
+import Array
 import ServerBook
 import ServerConfig exposing (ServerConfig)
 import UserCreds exposing (UserCreds)
@@ -44,12 +45,12 @@ initLoginModel =
 
 initLibraryModel : LibraryModel
 initLibraryModel =
-    { books = [], selectedBook = Nothing }
+    { books = Array.empty, selectedBook = Nothing }
 
 
 initConfigModel : ConfigModel
 initConfigModel =
-    { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = [] }
+    { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty }
 
 
 initMainModel : Model
