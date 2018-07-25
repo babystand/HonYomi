@@ -5,6 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 
+
 // to extract the css as a separate file
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
@@ -101,21 +102,14 @@ if (MODE === "development") {
                     ]
                 }
             ]
-            // },
-            // devServer: {
-            //     inline: true,
-            //     stats: "errors-only",
-            //     contentBase: path.join(__dirname, "src/assets"),
-            //     // For SPAs: serve index.html in place of 404 responses
-            //     historyApiFallback: true
-            // }
+
         },
-        serve: {
-            inline: true,
-            stats: "errors-only",
-            content: path.join(__dirname, "src/assets"),
-            // For SPAs: serve index.html in place of 404 responses
-            historyApiFallback: true
+        devServer:{
+            contentBase: path.join(__dirname, 'wwwroot', 'dist'),
+            port: 3000,
+            proxy: {
+                '/api': 'http://127.0.0.1:5000'
+            }
         }
     });
 }
