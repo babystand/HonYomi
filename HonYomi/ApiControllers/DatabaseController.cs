@@ -14,10 +14,9 @@ namespace HonYomi.ApiControllers
     [ApiController]
     public class DatabaseController : Controller
     {
-        private HonyomiContext db;
-        public DatabaseController(HonyomiContext dbcontext)
+        public DatabaseController()
         {
-            db = dbcontext;
+    
         }
 
         [HttpGet]
@@ -28,7 +27,7 @@ namespace HonYomi.ApiControllers
             try
             {
      
-                    db.RemoveMissing();
+                    DataAccess.RemoveMissing();
                     return Ok();
              
             }
@@ -41,11 +40,11 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/db/scan")]
-        public async Task<IActionResult> ScanNow()
+        public  IActionResult ScanNow()
         {
             try
             {
-                await DirectoryScanner.ScanWatchDirectories();
+                DirectoryScanner.ScanWatchDirectories();
                 return Ok();
             }
             catch (Exception)
@@ -58,12 +57,12 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/books/list")]
-        public async Task<IActionResult> GetBooksForUser()
+        public IActionResult GetBooksForUser()
         {
             Console.WriteLine(User.Identity.Name);
             try
             {
-                var result = await db.GetUserBooks(User.Identity.Name);
+                var result =  DataAccess.GetUserBooks(User.Identity.Name);
                     return Json(result);
                
             }
@@ -75,7 +74,7 @@ namespace HonYomi.ApiControllers
                 [HttpGet]
                 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
                 [Route("/api/books/list/fake")]
-                public async Task<IActionResult> GetBooksForUserFake()
+                public IActionResult GetBooksForUserFake()
                 {
                     Console.WriteLine(User.Identity.Name);
                     try
@@ -94,11 +93,11 @@ namespace HonYomi.ApiControllers
                 }
 
         [HttpGet, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/config")]
-        public async Task<IActionResult> GetConfig()
+        public  IActionResult GetConfig()
         {
             try
             {
-                return Json(await db.GetConfigClient());
+                return Json( DataAccess.GetConfigClient());
             }
             catch (Exception)
             {
@@ -107,24 +106,27 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpPost, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/config")]
-        public async Task<IActionResult> SetConfig([FromBody] ConfigClientModel model)
+        public  IActionResult SetConfig([FromBody] ConfigClientModel model)
         {
             try
             {
-                var config = await db.Configs.Include(x => x.WatchDirectories).FirstAsync();
-                config.ScanInterval    = model.ScanInterval;
-                config.ServerPort      = model.ServerPort;
-                config.WatchForChanges = model.WatchForChanges;
-                //todo: be smarter about upserting
-                foreach (WatchDirClientModel dir in model.WatchDirectories)
+                using (var db = new HonyomiContext())
                 {
-                    if (config.WatchDirectories.All(x => x.Path != dir.Path))
+                    var config =  db.Configs.Include(x => x.WatchDirectories).First();
+                    config.ScanInterval    = model.ScanInterval;
+                    config.ServerPort      = model.ServerPort;
+                    config.WatchForChanges = model.WatchForChanges;
+                    //todo: be smarter about upserting
+                    foreach (WatchDirClientModel dir in model.WatchDirectories)
                     {
-                        db.WatchDirectories.Add(new WatchDirectory() {ConfigId = config.HonyomiConfigId, Path = dir.Path});
+                        if (config.WatchDirectories.All(x => x.Path != dir.Path))
+                        {
+                            db.WatchDirectories.Add(new WatchDirectory() {ConfigId = config.HonyomiConfigId, Path = dir.Path});
+                        }
                     }
-                }
 
-                await db.SaveChangesAsync();
+                    db.SaveChanges();
+                }
                 return Ok();
             }
             catch (Exception)
@@ -134,17 +136,20 @@ namespace HonYomi.ApiControllers
         }
 
         [HttpPost, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/directories/add")]
-        public async Task<IActionResult> AddWatchDirectory([FromBody] string[] paths)
+        public IActionResult AddWatchDirectory([FromBody] string[] paths)
         {
             try
             {
-                foreach (string path in paths)
+                using (var db = new HonyomiContext())
                 {
-                    await db.WatchDirectories.AddAsync(new WatchDirectory { Path = path, Config = await db.GetConfig() });
-                }
+                    foreach (string path in paths)
+                    {
+                        db.WatchDirectories.Add(new WatchDirectory { Path = path, Config =  DataAccess.GetConfig() });
+                    }
 
-                await db.SaveChangesAsync();
-                return Json(await db.GetConfigClient());
+                    db.SaveChanges();
+                    return Json( DataAccess.GetConfigClient());
+                }
             }
             catch (Exception)
             {
@@ -153,22 +158,25 @@ namespace HonYomi.ApiControllers
 
         }
         [HttpPost, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/db/directories/remove")]
-        public async Task<IActionResult> RemoveWatchDirectory([FromBody] string[] paths)
+        public IActionResult RemoveWatchDirectory([FromBody] string[] paths)
         {
             try
             {
-                foreach (string path in paths)
+                using (var db = new HonyomiContext())
                 {
-                    var wdRecord = await db.WatchDirectories.FirstOrDefaultAsync(x => x.Path == path);
-                    if (wdRecord == null)
+                    foreach (string path in paths)
                     {
-                        continue;
+                        var wdRecord =  db.WatchDirectories.FirstOrDefault(x => x.Path == path);
+                        if (wdRecord == null)
+                        {
+                            continue;
+                        }
+                        db.WatchDirectories.Remove(wdRecord);
                     }
-                    db.WatchDirectories.Remove(wdRecord);
-                }
 
-                await db.SaveChangesAsync();
-                return Json(await db.GetConfigClient());
+                    db.SaveChanges();
+                    return Json( DataAccess.GetConfigClient());
+                }
             }
             catch (Exception)
             {
@@ -180,12 +188,12 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/books/get/{bookId}")]
-        public async Task<IActionResult> GetBookForUser(Guid bookId)
+        public  IActionResult GetBookForUser(Guid bookId)
         {
             try
             {
               
-                    return Json(await db.GetUserBookProgress(User.Identity.Name, bookId));
+                    return Json( DataAccess.GetUserBookProgress(User.Identity.Name, bookId));
                 
             }
             catch (Exception)

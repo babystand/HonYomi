@@ -59,12 +59,12 @@ namespace HonYomi.Core
             }
         }
 
-        public static  async Task ScanWatchDirectories()
+        public static void ScanWatchDirectories()
         {
             using (var db = new HonyomiContext())
             {
                 var scanned = db.WatchDirectories.Select(x => x.Path).AsEnumerable().SelectMany(ScanDirectory);
-                await db.InsertNewBooks(scanned);
+                DataAccess.InsertNewBooks(scanned);
             }
         }
     }

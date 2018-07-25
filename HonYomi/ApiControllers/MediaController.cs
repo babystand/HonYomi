@@ -17,12 +17,12 @@ namespace HonYomi.ApiControllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/stream/{id}")]
         //accepts byte range headers
-        public async Task<FileStreamResult> GetAudioFile(Guid id)
+        public FileStreamResult GetAudioFile(Guid id)
         {
             string path, mimeType;
             using (var db = new HonyomiContext())
             {
-                var file = await db.Files.FirstAsync(x => x.IndexedFileId == id);
+                var file =  db.Files.First(x => x.IndexedFileId == id);
                 path = file.FilePath;
                 mimeType = file.MimeType;
             }
@@ -33,14 +33,13 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/progress/get/{trackId}")]
-        public async Task<IActionResult> GetTrackProgress(Guid trackId)
+        public IActionResult GetTrackProgress(Guid trackId)
         {
             try
             {
-                using (var db = new HonyomiContext())
-                {
-                    return Json(await db.GetUserFileProgress(User.Identity.Name, trackId));
-                }
+        
+                    return Json( DataAccess.GetUserFileProgress(User.Identity.Name, trackId));
+                
             }
             catch (Exception)
             {
@@ -51,24 +50,24 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/progress/set/{trackId}/{seconds}")]
-        public async Task<IActionResult> SetTrackProgress(Guid trackId, uint seconds)
+        public IActionResult SetTrackProgress(Guid trackId, uint seconds)
         {
             try
             {
                 using (var db = new HonyomiContext())
                 {
                     FileProgress prog =
-                       await db.FileProgresses.SingleOrDefaultAsync(x => x.UserId == User.Identity.Name && x.FileId == trackId);
+                        db.FileProgresses.SingleOrDefault(x => x.UserId == User.Identity.Name && x.FileId == trackId);
                     if (prog == null)
                     {
-                        await db.FileProgresses.AddAsync(
+                         db.FileProgresses.AddAsync(
                             new FileProgress {FileId = trackId, UserId = User.Identity.Name, Progress = seconds});
-                        await db.SaveChangesAsync();
+                         db.SaveChanges();
                     }
                     else
                     {
                         prog.Progress = seconds;
-                       await  db.SaveChangesAsync();
+                        db.SaveChanges();
                     }
 
                     return Ok();

@@ -111,7 +111,7 @@ namespace HonYomi
             /***Create DB and populate defaults if needed***/
             if (dbContext.Database.EnsureCreated())
             {
-                dbContext.CreateDefaults(uMan).Wait();
+                dbContext.CreateDefaults(uMan);
             }
 
             HonyomiConfig config = dbContext.Configs.First();
@@ -129,7 +129,7 @@ namespace HonYomi
                 dbContext.SaveChanges();
             }
 
-            DirectoryScanner.ScanWatchDirectories().Wait();
+            DirectoryScanner.ScanWatchDirectories();
             RecurringJob.AddOrUpdate("scan", () => DirectoryScanner.ScanWatchDirectories(),
                                      Cron.MinuteInterval(config.ScanInterval));
         }

@@ -18,12 +18,12 @@ import UserCreds as User exposing (encodeUserCreds)
 mapAuthRequest : Result Http.Error JsonToken -> M.Msg
 mapAuthRequest result =
     M.Auth <|
-        case Debug.log "result" result of
+        case result of
             Ok s ->
                 M.LoginSuccess s.token
 
             Err err ->
-                case err of
+                case Debug.log "network error: " err of
                     Http.Timeout ->
                         M.LoginFailure "Network Error"
 
@@ -47,12 +47,12 @@ authRequest user =
 
 mapRefreshRequest : Result Http.Error JsonToken -> M.Msg
 mapRefreshRequest result =
-    case Debug.log "result" result of
+    case result of
         Ok s ->
             M.Refresh s.token
 
         Err err ->
-            case err of
+            case Debug.log "network error: " err of
                 Http.Timeout ->
                     M.NoOp
 
@@ -82,7 +82,7 @@ mapLibraryRequest result =
                 M.BooksSuccess lib
 
             Err err ->
-                case err of
+                case Debug.log "network error: " err of
                     Http.Timeout ->
                         M.BooksError "Network Error"
 
@@ -102,7 +102,7 @@ mapLibraryRequest result =
 libraryRequest : Models.Token -> Cmd M.Msg
 libraryRequest tok =
     Http.send mapLibraryRequest <|
-        Jwt.get tok "/api/books/list/fake" <|
+        Jwt.get tok "/api/books/list" <|
             Json.Decode.array ServerBook.decodeServerBook
 
 
@@ -114,7 +114,7 @@ mapConfigRequest result =
                 M.ConfigSuccess config
 
             Err err ->
-                case err of
+                case Debug.log "network error: " err of
                     Http.Timeout ->
                         M.ConfigError "Network Error"
 
