@@ -58,6 +58,12 @@ namespace HonYomi.ApiControllers
             
             throw new ApplicationException("UNKNOWN_ERROR");
         }
+        [HttpGet, Authorize, Route("/api/auth/refresh")]
+        public async Task<object> Refresh() {
+            var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == User.Identity.Name);
+            return Json(GenerateJwtToken(User.Identity.Name, user));
+        }
+
         private TokenObject GenerateJwtToken(string username, IdentityUser user)
         {
             var claims = new List<Claim>

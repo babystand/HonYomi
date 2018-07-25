@@ -39,6 +39,8 @@ type RouteMsg
 
 type Msg
     = NoOp
+    | TriggerRefresh
+    | Refresh Models.Token
     | Auth AuthMsg
     | Library LibraryMsg
     | Config ConfigMsg

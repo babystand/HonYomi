@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import List exposing (map)
 import Messages exposing (..)
 import Models exposing (..)
-import Requests exposing (authRequest, libraryRequest, mapAuthRequest)
+import Requests exposing (authRequest, libraryRequest, mapAuthRequest, refreshRequest)
 import ServerBook exposing (ServerBook)
 import ServerConfig exposing (WatchDir)
 
@@ -20,6 +20,16 @@ init =
     ( initMainModel, Cmd.none )
 
 
+replaceToken : Model -> Token -> Model
+replaceToken model token =
+    case model of
+        Unauthorized page ->
+            model
+
+        Authorized oldToken page ->
+            Authorized token page
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     let
@@ -29,6 +39,12 @@ update message model =
     case ( message, page ) of
         ( NoOp, _ ) ->
             ( model, Cmd.none )
+
+        ( TriggerRefresh, _ ) ->
+            ( model, refreshRequest <| getToken model )
+
+        ( Refresh tok, _ ) ->
+            ( replaceToken model tok, Cmd.none )
 
         ( Auth authmsg, LoginPage lpage ) ->
             case authmsg of

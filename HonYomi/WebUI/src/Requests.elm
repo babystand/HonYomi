@@ -45,6 +45,35 @@ authRequest user =
     Http.send mapAuthRequest <| Http.post "/api/auth/login" (Http.jsonBody <| encodeUserCreds user) decodeJsonToken
 
 
+mapRefreshRequest : Result Http.Error JsonToken -> M.Msg
+mapRefreshRequest result =
+    case Debug.log "result" result of
+        Ok s ->
+            M.Refresh s.token
+
+        Err err ->
+            case err of
+                Http.Timeout ->
+                    M.NoOp
+
+                Http.NetworkError ->
+                    M.NoOp
+
+                Http.BadPayload m r ->
+                    M.NoOp
+
+                Http.BadStatus s ->
+                    M.NoOp
+
+                Http.BadUrl _ ->
+                    M.NoOp
+
+
+refreshRequest : Models.Token -> Cmd M.Msg
+refreshRequest tok =
+    Http.send mapRefreshRequest <| Jwt.get tok "/api/auth/refresh" decodeJsonToken
+
+
 mapLibraryRequest : Result Http.Error ServerBook.Library -> M.Msg
 mapLibraryRequest result =
     M.Library <|
