@@ -105,8 +105,9 @@ if (MODE === "development") {
 
         },
         devServer:{
-            contentBase: path.join(__dirname, 'wwwroot', 'dist'),
+            contentBase: path.join(__dirname),
             port: 3000,
+            publicPath: "/",
             proxy: {
                 '/api': 'http://127.0.0.1:5000'
             }
