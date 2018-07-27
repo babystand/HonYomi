@@ -13,7 +13,7 @@ loginPageView loginModel =
     div [ class "page-wrapper" ]
         [ div [ class "page-body" ]
             [ div [ id "login-section" ]
-                [ h3 [] [ text "Login" ]
+                [ h1 [] [ text "Login" ]
                 , div [ id "login-inner" ]
                     [ input [ id "username", placeholder "Username", onEnter (Auth LoginRequest), onInput (\x -> Auth (SetUsernameField x)) ] []
                     , br [] []

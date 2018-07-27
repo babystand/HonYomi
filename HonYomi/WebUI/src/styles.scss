@@ -1,36 +1,24 @@
 @import '~purecss/build/pure.css';
-$mid-blue: #2D344D;	// Main Primary color */
-$light-blue: #808698;
-$midlight-blue: #4F5772;
-$middark-blue: #172040;
-$dark-blue: #030A20;
-
-$mid-red: #71443C;	// Main Secondary color (1) */
-$light-red: #E1BFB9;
-$midlight-red: #A9776E;
-$middark-red: #5F251A;
-$dark-red: #300700;
-
-$mid-green: #2C5339;	// Main Secondary color (2) */
-$light-greend: #88A591;
-$midlight-green: #507C5F;
-$middark-green: #134524;
-$dark-green: #00230C;
-
-$mid-yellow: #71613C;	// Main Complement color */
-$light-yellow: #E1D5B9;
-$midlight-yellow: #A9966E;
-$light-yellow: #5F491A;
-$dark-yellow: #302100;
+$white:#E3E2E2;
+$light: #CCCBCB;
+$medium: #696B6B;
+$dark: #403F40;
+$black: #262626;
+$red: #AF3245;
+$pink: #FF5672;
+$green: #C6ED68;
+$blue: #A1E8E5;
 body {
-    background-color: $dark-blue;
+    background-color: $black;
     margin-top: 20px;
 }
+
 .container {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
 }
+
 header {
     display: flex;
     align-items: center;
@@ -39,75 +27,100 @@ header {
         margin-right: 30px;
     }
 }
+
 button {
     margin-right: 15px;
 }
 
-.page-wrapper{
-
-    .page-body{
+.page-wrapper {
+    .page-body {
         margin: auto;
         max-width: 1080px;
         min-width: 600px;
     }
 }
 
-#login-section{
-    margin: 50px auto;
-        width: 300px;
-        height: 200px;
-    background: $mid-blue;
-    border: black solid 1px;
+.nav-routes {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    background: #111111;
+    color: $light;
+    height: 25px;
+    #routes {
+        height: 25px;
+        margin: auto;
+        padding-inline-start: 10px;
+        display: inline-block;
+        vertical-align: bottom;
+        .route {
+            padding-top: 2px;
+            display: inline-block;
+            vertical-align: bottom;
+            font-size: 16px;
+            height: 25px;
+            margin-right: 12px;
+            cursor: pointer;
+            &:hover {
+                background: $dark;
+            }
+        }
+    }
+}
+
+#login-section {
+    margin: 100px auto;
+    width: 300px;
+    height: 200px; // background: $dark;
+    // border: black solid 1px;
     text-align: center;
-    text-shadow:
-		-1px -1px 0 $middark-blue,
-		1px -1px 0 $middark-blue,
-		-1px 1px 0 $middark-blue,
-		1px 1px 0 $middark-blue;
-    color: $light-blue;
+    color: $light;
     border-radius: 5px;
-    #login-inner{
+    #login-inner {
         margin: 15px;
+        margin-top: 25px;
         padding: 10px;
-        input{
+        input {
             margin: auto;
-             width: 80%;
+            width: 250px;
+            height: 30px;
             text-align: center;
             font-weight: bold;
+            font-size: 110%;
             margin: 5px 0 5px 0;
-            background: $light-blue;
+            background: $dark;
             border: none;
-            color: $middark-blue;
+            color: $light;
         }
-        button{
+        button {
             margin: auto;
-            margin-top: 15px;
-            background: $light-blue;
+            margin-top: 25px;
+            background: $dark;
             border-radius: 5px;
-            color: $middark-blue;
+            color: $light;
             font-size: 1.1em;
             font-weight: 700;
             border-style: none;
             border: none;
-            border-color: $mid-blue;
-            width: 100px;
-            height: 25px;
-
+            border-color: $medium;
+            width: 150px;
+            height: 35px;
         }
     }
 }
-#library-books{
-    background: $middark-blue;
-    color: $light-blue;
-    .book-table{
+
+#library-books {
+    background: $medium;
+    color: $light;
+    .book-table {
         width: 500px;
-        tr{
+        tr {
             width: 100%;
         }
-        td{
+        td {
             width: 50px;
         }
-        .scrollable-table{
+        .scrollable-table {
             display: block;
             height: 200px;
             overflow: auto;

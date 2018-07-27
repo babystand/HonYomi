@@ -12,13 +12,20 @@ import ServerBook exposing (ServerBook)
 import ServerConfig exposing (WatchDir)
 
 
-bookRow : ServerBook -> Html Msg
-bookRow book =
-    tr [ class "book-row" ]
-        [ td [] [ text <| withDefault book.guid book.title ]
-        , td [] [ text <| book.guid ]
-        , td [] [ text <| toString <| Array.length book.fileProgresses ]
-        ]
+bookRow : Int -> ServerBook -> Html Msg
+bookRow index book =
+    let
+        rowClass =
+            if index % 2 == 0 then
+                class "tableRow"
+            else
+                class "tableRowAlt"
+    in
+        tr [ class "book-row", rowClass ]
+            [ td [] [ text <| withDefault book.guid book.title ]
+            , td [] [ text <| book.guid ]
+            , td [] [ text <| toString <| Array.length book.fileProgresses ]
+            ]
 
 
 bookTable : Array ServerBook -> Html Msg
@@ -31,7 +38,7 @@ bookTable books =
                 , th [] [ text "Tracks" ]
                 ]
             ]
-        , tbody [ class "scrollable-table" ] (Array.toList <| Array.map bookRow books)
+        , tbody [ class "scrollable-table" ] (Array.toList <| Array.indexedMap bookRow books)
         ]
 
 
