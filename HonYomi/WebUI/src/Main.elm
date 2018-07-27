@@ -7,7 +7,7 @@ import LibraryView exposing (libraryPageView)
 import LoginView exposing (loginPageView)
 import Messages exposing (..)
 import Models exposing (..)
-import Requests exposing (authRequest, libraryRequest, mapAuthRequest, refreshRequest)
+import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, refreshRequest)
 
 
 type alias Page =
@@ -100,7 +100,48 @@ update message model =
             ( model, Cmd.none )
 
         ( Config config, ConfigPage cpage ) ->
-            ( model, Cmd.none )
+            case config of
+                ConfigGetRequest ->
+                    ( model, configGetRequest <| getToken model )
+
+                ConfigPostRequest ->
+                    ( model, configPostRequest (getToken model) cpage.config )
+
+                ConfigSuccess conf ->
+                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+
+                ConfigError _ ->
+                    ( model, Cmd.none )
+
+                ToggleWatchForChanges ->
+                    let
+                        oldconf =
+                            cpage.config
+
+                        conf =
+                            { oldconf | watchForChanges = not cpage.config.watchForChanges }
+                    in
+                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+
+                SetScanInterval i ->
+                    let
+                        oldconf =
+                            cpage.config
+
+                        conf =
+                            { oldconf | scanInterval = i }
+                    in
+                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+
+                SetServerPort p ->
+                    let
+                        oldconf =
+                            cpage.config
+
+                        conf =
+                            { oldconf | serverPort = p }
+                    in
+                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
 
         ( Config config, _ ) ->
             ( model, Cmd.none )

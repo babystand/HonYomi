@@ -21,9 +21,9 @@ watchDirView watchDir =
 configPageView : ConfigModel -> Html Msg
 configPageView configModel =
     div []
-        [ div [] [ text <| "scan interval: " ++ toString configModel.scanInterval ]
-        , div [] [ text <| "server port: " ++ toString configModel.serverPort ]
+        [ div [] [ text <| "scan interval: " ++ toString configModel.config.scanInterval ]
+        , div [] [ text <| "server port: " ++ toString configModel.config.serverPort ]
         , label [ for "watchForChanges" ] [ text "watch for changes: " ]
-        , input [ id "watchForChanges", type_ "checkbox", checked configModel.watchForChanges ] []
-        , div [] (Array.toList <| Array.map watchDirView configModel.watchDirectories)
+        , input [ id "watchForChanges", type_ "checkbox", checked configModel.config.watchForChanges ] []
+        , div [] (Array.toList <| Array.map watchDirView configModel.config.watchDirectories)
         ]

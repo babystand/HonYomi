@@ -24,7 +24,8 @@ type alias LibraryModel =
 
 
 type alias ConfigModel =
-    ServerConfig
+    { config : ServerConfig
+    }
 
 
 type Page
@@ -50,7 +51,7 @@ initLibraryModel =
 
 initConfigModel : ConfigModel
 initConfigModel =
-    { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty }
+    { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty } }
 
 
 initMainModel : Model

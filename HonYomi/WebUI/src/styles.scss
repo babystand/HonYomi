@@ -33,17 +33,30 @@ button {
 }
 
 .page-wrapper {
-    .page-body {
-        margin: auto;
-        max-width: 1080px;
-        min-width: 600px;
-    }
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.page-body {
+    position: relative;
+    top: 30px;
+}
+
+.main-content {
+    margin: auto;
+    max-width: 1080px;
+    min-width: 600px;
+}
+
+.page-header {
+    width: 100%;
+    top: 0;
+    position: absolute;
+    height: 25px;
 }
 
 .nav-routes {
-    width: 100%;
-    position: absolute;
-    top: 0;
     background: #111111;
     color: $light;
     height: 25px;
@@ -105,26 +118,56 @@ button {
             border-color: $medium;
             width: 150px;
             height: 35px;
+            text-align: center;
         }
     }
 }
 
 #library-books {
-    background: $medium;
-    color: $light;
     .book-table {
-        width: 500px;
-        tr {
-            width: 100%;
+        background: $medium;
+        color: $light;
+        width: 100%;
+        table-layout: fixed;
+        font-size: 12px;
+        thead {
+            background: #111111;
+            tr {
+                height: 30px;
+                th {
+                    text-align: center;
+                    border-right: solid 1px #403F40;
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+            }
         }
-        td {
-            width: 50px;
+        tbody {
+            tr {
+                width: 100%;
+                border-bottom: solid 1px #403F40;
+                &:last-of-type{
+                    border-bottom: none;
+                }
+                td {
+                    text-align: center;
+                    height: 30px;
+                    border-right: solid 1px $black;
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+            }
         }
         .scrollable-table {
-            display: block;
-            height: 200px;
-            overflow: auto;
+            max-height: 200px;
+            overflow-y: auto;
             width: 100%;
         }
     }
+}
+
+.hidden {
+    display: none;
 }

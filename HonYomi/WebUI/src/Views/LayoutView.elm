@@ -60,7 +60,7 @@ pageHeader =
 bodyLayout : String -> Html Msg -> Html Msg
 bodyLayout pagename html =
     div [ class "page-body" ]
-        [ div [ class "page-info" ] [ h2 [] [ text pagename ] ]
+        [ div [ class "page-info" ] [ h2 [ class "hidden" ] [ text pagename ] ]
         , div [ class "main-content" ] [ html ]
         ]
 

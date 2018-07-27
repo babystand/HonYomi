@@ -10,7 +10,7 @@ import Models exposing (..)
 
 loginPageView : LoginModel -> Html Msg
 loginPageView loginModel =
-    div [ class "page-wrapper" ]
+    div [ class "wrapper" ]
         [ div [ class "page-body" ]
             [ div [ id "login-section" ]
                 [ h1 [] [ text "Login" ]
