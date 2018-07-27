@@ -3,7 +3,7 @@ module ConfigView exposing (..)
 import Array exposing (Array)
 import Exts.Html.Events exposing (onEnter)
 import Html exposing (..)
-import Html.Attributes exposing (checked, for, hidden, id, placeholder, type_)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Messages exposing (..)
 import Models exposing (..)
@@ -20,10 +20,13 @@ watchDirView watchDir =
 
 configPageView : ConfigModel -> Html Msg
 configPageView configModel =
-    div []
-        [ div [] [ text <| "scan interval: " ++ toString configModel.config.scanInterval ]
-        , div [] [ text <| "server port: " ++ toString configModel.config.serverPort ]
-        , label [ for "watchForChanges" ] [ text "watch for changes: " ]
-        , input [ id "watchForChanges", type_ "checkbox", checked configModel.config.watchForChanges ] []
-        , div [] (Array.toList <| Array.map watchDirView configModel.config.watchDirectories)
+    div [ id "config-section" ]
+        [ div [ class "config-values" ]
+            [ table []
+                [ tr [] [ td [] [ text "Scan Interval (minutes)" ], td [] [ input [ value <| toString configModel.config.scanInterval ] [] ] ]
+                , tr [] [ td [] [ text "Server Port (requires restart)" ], td [] [ input [ value <| toString configModel.config.serverPort ] [] ] ]
+                , tr [] [ td [] [ text "Watch for Changes" ], td [] [ input [ type_ "checkbox", checked configModel.config.watchForChanges ] [] ] ]
+                ]
+            ]
+        , div [ class "config-dirs" ] [ div [] (Array.toList <| Array.map watchDirView configModel.config.watchDirectories) ]
         ]
