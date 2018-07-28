@@ -1,15 +1,12 @@
 module LibraryView exposing (..)
 
 import Array exposing (Array)
-import Exts.Html.Events exposing (onEnter)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
 import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import ServerBook exposing (ServerBook)
-import ServerConfig exposing (WatchDir)
 
 
 bookRow : Int -> ServerBook -> Html Msg
@@ -18,14 +15,15 @@ bookRow index book =
         rowClass =
             if index % 2 == 0 then
                 class "tableRow"
+
             else
                 class "tableRowAlt"
     in
-        tr [ class "book-row", rowClass ]
-            [ td [] [ text <| withDefault book.guid book.title ]
-            , td [] [ text <| book.guid ]
-            , td [] [ text <| toString <| Array.length book.fileProgresses ]
-            ]
+    tr [ class "book-row", rowClass ]
+        [ td [] [ text <| withDefault book.guid book.title ]
+        , td [] [ text <| book.guid ]
+        , td [] [ text <| toString <| Array.length book.fileProgresses ]
+        ]
 
 
 bookTable : Array ServerBook -> Html Msg

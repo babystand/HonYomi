@@ -21,26 +21,17 @@ init =
 
 replaceToken : Model -> Token -> Model
 replaceToken model token =
-    case model of
-        Unauthorized page ->
-            model
-
-        Authorized oldToken page ->
-            Authorized token page
+    { model | token = token }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
-    let
-        page =
-            getPage model
-    in
-    case ( message, page ) of
+    case ( message, model.page ) of
         ( NoOp, _ ) ->
             ( model, Cmd.none )
 
         ( TriggerRefresh, _ ) ->
-            ( model, refreshRequest <| getToken model )
+            ( model, refreshRequest model.token )
 
         ( Refresh tok, _ ) ->
             ( replaceToken model tok, Cmd.none )
@@ -52,14 +43,14 @@ update message model =
                         newPage =
                             { lpage | username = s }
                     in
-                    ( Unauthorized <| LoginPage newPage, Cmd.none )
+                    ( { model | page = LoginPage newPage }, Cmd.none )
 
                 Messages.SetPasswordField s ->
                     let
                         newPage =
                             { lpage | password = s }
                     in
-                    ( Unauthorized <| LoginPage newPage, Cmd.none )
+                    ( { model | page = LoginPage newPage }, Cmd.none )
 
                 Messages.LoginRequest ->
                     let
@@ -69,7 +60,7 @@ update message model =
                     ( model, authResponse )
 
                 Messages.LoginSuccess tok ->
-                    update (Library BooksRequest) (Authorized tok <| LibraryPage initLibraryModel)
+                    update (Library BooksRequest) { model | token = tok, page = LibraryPage initLibraryModel }
 
                 Messages.LoginFailure _ ->
                     ( model, Cmd.none )
@@ -82,7 +73,7 @@ update message model =
                 BooksRequest ->
                     let
                         booksResponse =
-                            libraryRequest <| getToken model
+                            libraryRequest model.token
                     in
                     ( model, booksResponse )
 
@@ -91,7 +82,7 @@ update message model =
                         newPage =
                             { lpage | books = bs }
                     in
-                    ( Authorized (getToken model) <| LibraryPage newPage, Cmd.none )
+                    ( { model | page = LibraryPage newPage }, Cmd.none )
 
                 Messages.BooksError _ ->
                     ( model, Cmd.none )
@@ -102,13 +93,17 @@ update message model =
         ( Config config, ConfigPage cpage ) ->
             case config of
                 ConfigGetRequest ->
-                    ( model, configGetRequest <| getToken model )
+                    ( model, configGetRequest <| model.token )
 
                 ConfigPostRequest ->
-                    ( model, configPostRequest (getToken model) cpage.config )
+                    ( model, configPostRequest model.token cpage.config )
 
                 ConfigSuccess conf ->
-                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+                    let
+                        newPage =
+                            ConfigPage { cpage | config = conf }
+                    in
+                    ( { model | page = newPage }, Cmd.none )
 
                 ConfigError _ ->
                     ( model, Cmd.none )
@@ -120,8 +115,11 @@ update message model =
 
                         conf =
                             { oldconf | watchForChanges = not cpage.config.watchForChanges }
+
+                        newPage =
+                            ConfigPage { cpage | config = conf }
                     in
-                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+                    ( { model | page = newPage }, Cmd.none )
 
                 SetScanInterval i ->
                     let
@@ -130,8 +128,11 @@ update message model =
 
                         conf =
                             { oldconf | scanInterval = i }
+
+                        newPage =
+                            ConfigPage { cpage | config = conf }
                     in
-                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+                    ( { model | page = newPage }, Cmd.none )
 
                 SetServerPort p ->
                     let
@@ -140,8 +141,11 @@ update message model =
 
                         conf =
                             { oldconf | serverPort = p }
+
+                        newPage =
+                            ConfigPage { cpage | config = conf }
                     in
-                    ( Authorized (getToken model) <| ConfigPage { cpage | config = conf }, Cmd.none )
+                    ( { model | page = newPage }, Cmd.none )
 
         ( Config config, _ ) ->
             ( model, Cmd.none )
@@ -149,34 +153,27 @@ update message model =
         ( Route route, _ ) ->
             case route of
                 RouteToLibrary ->
-                    update (Library BooksRequest) (Authorized (getToken model) <| LibraryPage initLibraryModel)
+                    update (Library BooksRequest) { model | page = LibraryPage initLibraryModel }
 
                 RouteToConfig ->
-                    update (Config ConfigGetRequest) (Authorized (getToken model) <| ConfigPage initConfigModel)
+                    update (Config ConfigGetRequest) { model | page = ConfigPage initConfigModel }
 
 
 getPageView : Model -> Html Msg
 getPageView model =
-    case model of
-        Unauthorized (LoginPage pmod) ->
+    case model.page of
+        LoginPage pmod ->
             loginPageView pmod
 
-        Authorized _ (LibraryPage pmod) ->
+        LibraryPage pmod ->
             libraryPageView pmod
 
-        Authorized _ (ConfigPage cmod) ->
+        ConfigPage cmod ->
             configPageView cmod
-
-        _ ->
-            div [] [ text "The only way to get here is to be on a page without a view. I'm impressed " ]
 
 
 view : Model -> Html Msg
 view model =
-    let
-        page =
-            getPage model
-    in
     applyLayout model <| getPageView model
 
 

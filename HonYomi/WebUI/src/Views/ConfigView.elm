@@ -1,10 +1,8 @@
 module ConfigView exposing (..)
 
 import Array exposing (Array)
-import Exts.Html.Events exposing (onEnter)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
 import Messages exposing (..)
 import Models exposing (..)
 import ServerConfig exposing (WatchDir)

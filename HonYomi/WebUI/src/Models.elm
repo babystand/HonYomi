@@ -34,9 +34,10 @@ type Page
     | ConfigPage ConfigModel
 
 
-type Model
-    = Unauthorized Page
-    | Authorized Token Page
+type alias Model =
+    { token : Token
+    , page : Page
+    }
 
 
 initLoginModel : LoginModel
@@ -56,24 +57,4 @@ initConfigModel =
 
 initMainModel : Model
 initMainModel =
-    Unauthorized <| LoginPage initLoginModel
-
-
-getPage : Model -> Page
-getPage model =
-    case model of
-        Unauthorized page ->
-            page
-
-        Authorized _ page ->
-            page
-
-
-getToken : Model -> Token
-getToken model =
-    case model of
-        Unauthorized _ ->
-            ""
-
-        Authorized token _ ->
-            token
+    { token = "", page = LoginPage initLoginModel }

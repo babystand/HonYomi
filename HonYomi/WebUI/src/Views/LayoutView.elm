@@ -25,13 +25,13 @@ applyLayout : Model -> Html Msg -> Html Msg
 applyLayout model html =
     let
         pagename =
-            getPageName <| getPage model
+            getPageName model.page
     in
-    case model of
-        Unauthorized _ ->
+    case model.page of
+        LoginPage _ ->
             html
 
-        Authorized _ _ ->
+        _ ->
             layoutView pagename html
 
 
