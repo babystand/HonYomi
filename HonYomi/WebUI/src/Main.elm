@@ -108,13 +108,13 @@ update message model =
                 ConfigError _ ->
                     ( model, Cmd.none )
 
-                ToggleWatchForChanges ->
+                SetWatchForChanges b ->
                     let
                         oldconf =
                             cpage.config
 
                         conf =
-                            { oldconf | watchForChanges = not cpage.config.watchForChanges }
+                            { oldconf | watchForChanges = b }
 
                         newPage =
                             ConfigPage { cpage | config = conf }
@@ -146,6 +146,27 @@ update message model =
                             ConfigPage { cpage | config = conf }
                     in
                     ( { model | page = newPage }, Cmd.none )
+
+                AddDir ->
+                    let
+                        newPage =
+                            addWatchDirectory cpage
+                    in
+                    ( { model | page = ConfigPage newPage }, Cmd.none )
+
+                RemoveDir i ->
+                    let
+                        newPage =
+                            removeWatchDirectory i cpage
+                    in
+                    ( { model | page = ConfigPage newPage }, Cmd.none )
+
+                ModifyDir i s ->
+                    let
+                        newPage =
+                            modifyWatchDirectory i s cpage
+                    in
+                    ( { model | page = ConfigPage newPage }, Cmd.none )
 
         ( Config config, _ ) ->
             ( model, Cmd.none )

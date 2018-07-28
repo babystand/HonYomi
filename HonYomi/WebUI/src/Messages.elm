@@ -27,9 +27,12 @@ type ConfigMsg
     | ConfigPostRequest
     | ConfigSuccess ServerConfig
     | ConfigError String
-    | ToggleWatchForChanges
+    | SetWatchForChanges Bool
     | SetScanInterval Int
     | SetServerPort Int
+    | AddDir
+    | RemoveDir Int
+    | ModifyDir Int String
 
 
 type RouteMsg

@@ -9,7 +9,7 @@ import Json.Encode
 
 
 type alias WatchDir =
-    { guid : String, path : String }
+    { path : String, guid : String }
 
 
 type alias ServerConfig =

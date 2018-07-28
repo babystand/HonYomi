@@ -4,6 +4,8 @@
 module Models exposing (..)
 
 import Array
+import Exts.Array
+import Maybe exposing (withDefault)
 import ServerBook
 import ServerConfig exposing (ServerConfig)
 import UserCreds exposing (UserCreds)
@@ -58,3 +60,51 @@ initConfigModel =
 initMainModel : Model
 initMainModel =
     { token = "", page = LoginPage initLoginModel }
+
+
+removeWatchDirectory : Int -> ConfigModel -> ConfigModel
+removeWatchDirectory index model =
+    let
+        conf =
+            model.config
+
+        newDirs =
+            Exts.Array.delete index model.config.watchDirectories
+
+        newconf =
+            { conf | watchDirectories = newDirs }
+    in
+    { config = newconf }
+
+
+addWatchDirectory : ConfigModel -> ConfigModel
+addWatchDirectory model =
+    let
+        conf =
+            model.config
+
+        newDirs =
+            Array.push { guid = "", path = "" } model.config.watchDirectories
+
+        newconf =
+            { conf | watchDirectories = newDirs }
+    in
+    { config = newconf }
+
+
+modifyWatchDirectory : Int -> String -> ConfigModel -> ConfigModel
+modifyWatchDirectory index newPath model =
+    let
+        old =
+            Array.get index model.config.watchDirectories |> withDefault { guid = "", path = "" }
+
+        new =
+            { old | path = newPath }
+
+        conf =
+            model.config
+
+        newconf =
+            { conf | watchDirectories = model.config.watchDirectories |> Array.set index new }
+    in
+    { model | config = newconf }
