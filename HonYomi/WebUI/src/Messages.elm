@@ -6,6 +6,7 @@ module Messages exposing (..)
 import Models
 import ServerBook as Book
 import ServerConfig exposing (ServerConfig)
+import ServerFile exposing (ServerFile)
 
 
 type AuthMsg
@@ -14,6 +15,14 @@ type AuthMsg
     | LoginRequest
     | LoginSuccess Models.Token
     | LoginFailure String
+
+
+type PlaybackMsg
+    = SetTrack ServerFile
+
+
+
+--todo: figure out how the loading process will work, and how to wire up ports to do so
 
 
 type LibraryMsg

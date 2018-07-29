@@ -19,6 +19,16 @@ type alias LoginModel =
     UserCreds
 
 
+type alias PlaybackModel =
+    { guid : String
+    , url : String
+    , mediaType : String
+    , currentTime : Float
+    , duration : Float
+    , ended : Bool
+    }
+
+
 type alias LibraryModel =
     { books : ServerBook.Library
     , selectedBook : Maybe ServerBook.ServerBook
@@ -39,6 +49,7 @@ type Page
 type alias Model =
     { token : Token
     , page : Page
+    , playback : Maybe PlaybackModel
     }
 
 
@@ -59,7 +70,12 @@ initConfigModel =
 
 initMainModel : Model
 initMainModel =
-    { token = "", page = LoginPage initLoginModel }
+    { token = "", page = LoginPage initLoginModel, playback = Nothing }
+
+
+getPlayback : Model -> PlaybackModel
+getPlayback model =
+    model.playback |> withDefault { guid = "", url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel

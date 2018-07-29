@@ -24,6 +24,138 @@ replaceToken model token =
     { model | token = token }
 
 
+updateLoginPage : Model -> AuthMsg -> LoginModel -> ( Model, Cmd Msg )
+updateLoginPage model authmsg lpage =
+    case authmsg of
+        SetUsernameField s ->
+            let
+                newPage =
+                    { lpage | username = s }
+            in
+            ( { model | page = LoginPage newPage }, Cmd.none )
+
+        Messages.SetPasswordField s ->
+            let
+                newPage =
+                    { lpage | password = s }
+            in
+            ( { model | page = LoginPage newPage }, Cmd.none )
+
+        Messages.LoginRequest ->
+            let
+                authResponse =
+                    authRequest lpage
+            in
+            ( model, authResponse )
+
+        Messages.LoginSuccess tok ->
+            update (Library BooksRequest) { model | token = tok, page = LibraryPage initLibraryModel }
+
+        Messages.LoginFailure _ ->
+            ( model, Cmd.none )
+
+
+updateLibraryPage : Model -> LibraryMsg -> LibraryModel -> ( Model, Cmd Msg )
+updateLibraryPage model libmsg lpage =
+    case libmsg of
+        BooksRequest ->
+            let
+                booksResponse =
+                    libraryRequest model.token
+            in
+            ( model, booksResponse )
+
+        Messages.BooksSuccess bs ->
+            let
+                newPage =
+                    { lpage | books = bs }
+            in
+            ( { model | page = LibraryPage newPage }, Cmd.none )
+
+        Messages.BooksError _ ->
+            ( model, Cmd.none )
+
+
+updateConfigPage : Model -> ConfigMsg -> ConfigModel -> ( Model, Cmd Msg )
+updateConfigPage model config cpage =
+    case config of
+        ConfigGetRequest ->
+            ( model, configGetRequest <| model.token )
+
+        ConfigPostRequest ->
+            ( model, configPostRequest model.token cpage.config )
+
+        ConfigSuccess conf ->
+            let
+                newPage =
+                    ConfigPage { cpage | config = conf }
+            in
+            ( { model | page = newPage }, Cmd.none )
+
+        ConfigError _ ->
+            ( model, Cmd.none )
+
+        SetWatchForChanges b ->
+            let
+                oldconf =
+                    cpage.config
+
+                conf =
+                    { oldconf | watchForChanges = b }
+
+                newPage =
+                    ConfigPage { cpage | config = conf }
+            in
+            ( { model | page = newPage }, Cmd.none )
+
+        SetScanInterval i ->
+            let
+                oldconf =
+                    cpage.config
+
+                conf =
+                    { oldconf | scanInterval = i }
+
+                newPage =
+                    ConfigPage { cpage | config = conf }
+            in
+            ( { model | page = newPage }, Cmd.none )
+
+        SetServerPort p ->
+            let
+                oldconf =
+                    cpage.config
+
+                conf =
+                    { oldconf | serverPort = p }
+
+                newPage =
+                    ConfigPage { cpage | config = conf }
+            in
+            ( { model | page = newPage }, Cmd.none )
+
+        AddDir ->
+            let
+                newPage =
+                    addWatchDirectory cpage
+            in
+            ( { model | page = ConfigPage newPage }, Cmd.none )
+
+        RemoveDir i ->
+            let
+                newPage =
+                    removeWatchDirectory i cpage
+            in
+            ( { model | page = ConfigPage newPage }, Cmd.none )
+
+        ModifyDir i s ->
+            let
+                newPage =
+                    modifyWatchDirectory i s cpage
+            in
+            ( { model | page = ConfigPage newPage }, Cmd.none )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case ( message, model.page ) of
@@ -37,136 +169,19 @@ update message model =
             ( replaceToken model tok, Cmd.none )
 
         ( Auth authmsg, LoginPage lpage ) ->
-            case authmsg of
-                SetUsernameField s ->
-                    let
-                        newPage =
-                            { lpage | username = s }
-                    in
-                    ( { model | page = LoginPage newPage }, Cmd.none )
-
-                Messages.SetPasswordField s ->
-                    let
-                        newPage =
-                            { lpage | password = s }
-                    in
-                    ( { model | page = LoginPage newPage }, Cmd.none )
-
-                Messages.LoginRequest ->
-                    let
-                        authResponse =
-                            authRequest lpage
-                    in
-                    ( model, authResponse )
-
-                Messages.LoginSuccess tok ->
-                    update (Library BooksRequest) { model | token = tok, page = LibraryPage initLibraryModel }
-
-                Messages.LoginFailure _ ->
-                    ( model, Cmd.none )
+            updateLoginPage model authmsg lpage
 
         ( Auth authmsg, _ ) ->
             ( model, Cmd.none )
 
         ( Library libmsg, LibraryPage lpage ) ->
-            case libmsg of
-                BooksRequest ->
-                    let
-                        booksResponse =
-                            libraryRequest model.token
-                    in
-                    ( model, booksResponse )
-
-                Messages.BooksSuccess bs ->
-                    let
-                        newPage =
-                            { lpage | books = bs }
-                    in
-                    ( { model | page = LibraryPage newPage }, Cmd.none )
-
-                Messages.BooksError _ ->
-                    ( model, Cmd.none )
+            updateLibraryPage model libmsg lpage
 
         ( Library libmsg, _ ) ->
             ( model, Cmd.none )
 
         ( Config config, ConfigPage cpage ) ->
-            case config of
-                ConfigGetRequest ->
-                    ( model, configGetRequest <| model.token )
-
-                ConfigPostRequest ->
-                    ( model, configPostRequest model.token cpage.config )
-
-                ConfigSuccess conf ->
-                    let
-                        newPage =
-                            ConfigPage { cpage | config = conf }
-                    in
-                    ( { model | page = newPage }, Cmd.none )
-
-                ConfigError _ ->
-                    ( model, Cmd.none )
-
-                SetWatchForChanges b ->
-                    let
-                        oldconf =
-                            cpage.config
-
-                        conf =
-                            { oldconf | watchForChanges = b }
-
-                        newPage =
-                            ConfigPage { cpage | config = conf }
-                    in
-                    ( { model | page = newPage }, Cmd.none )
-
-                SetScanInterval i ->
-                    let
-                        oldconf =
-                            cpage.config
-
-                        conf =
-                            { oldconf | scanInterval = i }
-
-                        newPage =
-                            ConfigPage { cpage | config = conf }
-                    in
-                    ( { model | page = newPage }, Cmd.none )
-
-                SetServerPort p ->
-                    let
-                        oldconf =
-                            cpage.config
-
-                        conf =
-                            { oldconf | serverPort = p }
-
-                        newPage =
-                            ConfigPage { cpage | config = conf }
-                    in
-                    ( { model | page = newPage }, Cmd.none )
-
-                AddDir ->
-                    let
-                        newPage =
-                            addWatchDirectory cpage
-                    in
-                    ( { model | page = ConfigPage newPage }, Cmd.none )
-
-                RemoveDir i ->
-                    let
-                        newPage =
-                            removeWatchDirectory i cpage
-                    in
-                    ( { model | page = ConfigPage newPage }, Cmd.none )
-
-                ModifyDir i s ->
-                    let
-                        newPage =
-                            modifyWatchDirectory i s cpage
-                    in
-                    ( { model | page = ConfigPage newPage }, Cmd.none )
+            updateConfigPage model config cpage
 
         ( Config config, _ ) ->
             ( model, Cmd.none )
