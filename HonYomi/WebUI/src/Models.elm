@@ -8,6 +8,7 @@ import Exts.Array
 import Maybe exposing (withDefault)
 import ServerBook
 import ServerConfig exposing (ServerConfig)
+import ServerFile exposing (ServerFile)
 import UserCreds exposing (UserCreds)
 
 
@@ -20,11 +21,8 @@ type alias LoginModel =
 
 
 type alias PlaybackModel =
-    { guid : String
-    , url : String
-    , mediaType : String
-    , currentTime : Float
-    , duration : Float
+    { file : Maybe ServerFile
+    , position : Float
     , ended : Bool
     }
 
@@ -49,7 +47,7 @@ type Page
 type alias Model =
     { token : Token
     , page : Page
-    , playback : Maybe PlaybackModel
+    , playback : PlaybackModel
     }
 
 
@@ -68,14 +66,26 @@ initConfigModel =
     { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty } }
 
 
+initPlaybackModel : PlaybackModel
+initPlaybackModel =
+    { file = Nothing, ended = False, position = 0 }
+
+
 initMainModel : Model
 initMainModel =
-    { token = "", page = LoginPage initLoginModel, playback = Nothing }
+    { token = "", page = LoginPage initLoginModel, playback = initPlaybackModel }
 
 
-getPlayback : Model -> PlaybackModel
-getPlayback model =
-    model.playback |> withDefault { guid = "", url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }
+loadTrack : Model -> ServerFile -> Model
+loadTrack model serverFile =
+    let
+        oldplayback =
+            model.playback
+
+        newplayback =
+            { oldplayback | file = Just serverFile }
+    in
+    { model | playback = newplayback }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel
