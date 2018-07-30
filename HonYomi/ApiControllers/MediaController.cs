@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DataLib;
+using HonYomi.Exposed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,16 +16,36 @@ namespace HonYomi.ApiControllers
     {
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Route("/api/tracks/reserve/{guid}")]
+        public IActionResult ReserveAudioFile(Guid fileId)
+        {
+            try
+            {
+                TempMediaLocation tempMediaLocation =
+                    DataAccess.CreateTempMediaLocation(fileId, DateTime.Now + TimeSpan.FromHours(12));
+                return Ok(new FileReservation{Url = $"/api/tracks/stream/{tempMediaLocation.Id}", FileId = fileId, MimeType = tempMediaLocation.File.MimeType});
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
+        
+        [HttpGet]
         [Route("/api/tracks/stream/{id}")]
         //accepts byte range headers
-        public FileStreamResult GetAudioFile(Guid id)
+        public IActionResult GetAudioFile(Guid id)
         {
             string path, mimeType;
             using (var db = new HonyomiContext())
             {
-                var file =  db.Files.First(x => x.IndexedFileId == id);
-                path = file.FilePath;
-                mimeType = file.MimeType;
+                var file =  db.TempMediaLocations.Include(x => x.File).FirstOrDefault(x => x.Id == id);
+                if (file == null || file.Expires < DateTime.Now)
+                {
+                    return NotFound();
+                }
+                path = file.File.FilePath;
+                mimeType = file.File.MimeType;
             }
             return File(System.IO.File.OpenRead(path), mimeType, true);
 

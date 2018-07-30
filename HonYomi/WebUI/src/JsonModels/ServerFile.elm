@@ -4,6 +4,10 @@ import Json.Decode
 import Json.Decode.Pipeline
 
 
+type alias FileReservation =
+    { url : String, fileId : String, mimeType : String }
+
+
 type alias ServerFile =
     { guid : String
     , title : Maybe String
@@ -13,6 +17,14 @@ type alias ServerFile =
 
     --todo: file info
     }
+
+
+decodeFileReservation : Json.Decode.Decoder FileReservation
+decodeFileReservation =
+    Json.Decode.Pipeline.decode FileReservation
+        |> Json.Decode.Pipeline.required "url" Json.Decode.string
+        |> Json.Decode.Pipeline.required "fileId" Json.Decode.string
+        |> Json.Decode.Pipeline.required "mimeType" Json.Decode.string
 
 
 defaultServerFile : ServerFile

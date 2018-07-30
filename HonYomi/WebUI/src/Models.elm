@@ -21,7 +21,7 @@ type alias LoginModel =
 
 
 type alias PlaybackModel =
-    { file : Maybe ServerFile
+    { reservation : Maybe ( ServerFile, ServerFile.FileReservation )
     , position : Float
     , ended : Bool
     }
@@ -68,7 +68,7 @@ initConfigModel =
 
 initPlaybackModel : PlaybackModel
 initPlaybackModel =
-    { file = Nothing, ended = False, position = 0 }
+    { reservation = Nothing, ended = False, position = 0 }
 
 
 initMainModel : Model
@@ -76,16 +76,16 @@ initMainModel =
     { token = "", page = LoginPage initLoginModel, playback = initPlaybackModel }
 
 
-loadTrack : Model -> ServerFile -> Model
+loadTrack : Model -> ( ServerFile, ServerFile.FileReservation ) -> Model
 loadTrack model serverFile =
     let
         oldplayback =
             model.playback
 
         newplayback =
-            { oldplayback | file = Just serverFile }
+            { oldplayback | reservation = Just serverFile }
     in
-    { model | playback = newplayback }
+        { model | playback = newplayback }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel
@@ -100,7 +100,7 @@ removeWatchDirectory index model =
         newconf =
             { conf | watchDirectories = newDirs }
     in
-    { config = newconf }
+        { config = newconf }
 
 
 addWatchDirectory : ConfigModel -> ConfigModel
@@ -115,7 +115,7 @@ addWatchDirectory model =
         newconf =
             { conf | watchDirectories = newDirs }
     in
-    { config = newconf }
+        { config = newconf }
 
 
 modifyWatchDirectory : Int -> String -> ConfigModel -> ConfigModel
@@ -133,4 +133,4 @@ modifyWatchDirectory index newPath model =
         newconf =
             { conf | watchDirectories = model.config.watchDirectories |> Array.set index new }
     in
-    { model | config = newconf }
+        { model | config = newconf }

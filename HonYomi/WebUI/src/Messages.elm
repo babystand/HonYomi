@@ -6,7 +6,7 @@ module Messages exposing (..)
 import Models
 import ServerBook as Book
 import ServerConfig exposing (ServerConfig)
-import ServerFile exposing (ServerFile)
+import ServerFile exposing (..)
 
 
 type AuthMsg
@@ -18,7 +18,9 @@ type AuthMsg
 
 
 type PlaybackMsg
-    = SetTrack ServerFile
+    = ReserveTrackRequest ServerFile
+    | ReserveTrackSuccess ( ServerFile, FileReservation )
+    | ReserveTrackError String
 
 
 
@@ -56,4 +58,5 @@ type Msg
     | Auth AuthMsg
     | Library LibraryMsg
     | Config ConfigMsg
+    | Playback PlaybackMsg
     | Route RouteMsg
