@@ -11,8 +11,8 @@ import Messages as M
 import Models
 import Result
 import ServerBook
-import ServerFile exposing (..)
 import ServerConfig
+import ServerFile exposing (..)
 import UserCreds as User exposing (encodeUserCreds)
 
 
@@ -143,36 +143,3 @@ configPostRequest : Models.Token -> ServerConfig.ServerConfig -> Cmd M.Msg
 configPostRequest tok config =
     Http.send mapConfigRequest <|
         Jwt.post tok "/api/db/config" (jsonBody <| ServerConfig.encodeServerConfig config) ServerConfig.decodeServerConfig
-
-
-mapReserveTrackRequest : ServerFile -> Result Http.Error FileReservation -> M.Msg
-mapReserveTrackRequest file result =
-    M.Playback <|
-        case result of
-            Ok res ->
-                M.ReserveTrackSuccess ( file, res )
-
-            Err err ->
-                case Debug.log "network error: " err of
-                    Http.Timeout ->
-                        M.ReserveTrackError "Network Error"
-
-                    Http.NetworkError ->
-                        M.ReserveTrackError "Network Error"
-
-                    Http.BadPayload m r ->
-                        M.ReserveTrackError m
-
-                    Http.BadStatus s ->
-                        M.ReserveTrackError s.status.message
-
-                    Http.BadUrl _ ->
-                        M.ReserveTrackError "Bad URL"
-
-
-reserveTrackRequest : Models.Token -> ServerFile -> Cmd M.Msg
-reserveTrackRequest tok file =
-    Http.send
-        (mapReserveTrackRequest file)
-    <|
-        Jwt.get tok ("/api/tracks/reserve/" ++ file.guid) decodeFileReservation

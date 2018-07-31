@@ -8,7 +8,6 @@ import Exts.Array
 import Maybe exposing (withDefault)
 import ServerBook
 import ServerConfig exposing (ServerConfig)
-import ServerFile exposing (ServerFile)
 import UserCreds exposing (UserCreds)
 
 
@@ -21,8 +20,11 @@ type alias LoginModel =
 
 
 type alias PlaybackModel =
-    { reservation : Maybe ( ServerFile, ServerFile.FileReservation )
-    , position : Float
+    { guid : String
+    , url : String
+    , mediaType : String
+    , currentTime : Float
+    , duration : Float
     , ended : Bool
     }
 
@@ -47,7 +49,7 @@ type Page
 type alias Model =
     { token : Token
     , page : Page
-    , playback : PlaybackModel
+    , playback : Maybe PlaybackModel
     }
 
 
@@ -66,26 +68,14 @@ initConfigModel =
     { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty } }
 
 
-initPlaybackModel : PlaybackModel
-initPlaybackModel =
-    { reservation = Nothing, ended = False, position = 0 }
-
-
 initMainModel : Model
 initMainModel =
-    { token = "", page = LoginPage initLoginModel, playback = initPlaybackModel }
+    { token = "", page = LoginPage initLoginModel, playback = Nothing }
 
 
-loadTrack : Model -> ( ServerFile, ServerFile.FileReservation ) -> Model
-loadTrack model serverFile =
-    let
-        oldplayback =
-            model.playback
-
-        newplayback =
-            { oldplayback | reservation = Just serverFile }
-    in
-        { model | playback = newplayback }
+getPlayback : Model -> PlaybackModel
+getPlayback model =
+    model.playback |> withDefault { guid = "", url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel
@@ -100,7 +90,7 @@ removeWatchDirectory index model =
         newconf =
             { conf | watchDirectories = newDirs }
     in
-        { config = newconf }
+    { config = newconf }
 
 
 addWatchDirectory : ConfigModel -> ConfigModel
@@ -115,7 +105,7 @@ addWatchDirectory model =
         newconf =
             { conf | watchDirectories = newDirs }
     in
-        { config = newconf }
+    { config = newconf }
 
 
 modifyWatchDirectory : Int -> String -> ConfigModel -> ConfigModel
@@ -133,4 +123,4 @@ modifyWatchDirectory index newPath model =
         newconf =
             { conf | watchDirectories = model.config.watchDirectories |> Array.set index new }
     in
-        { model | config = newconf }
+    { model | config = newconf }

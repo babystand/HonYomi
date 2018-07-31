@@ -188,39 +188,6 @@ namespace DataLib
             }
         }
 
-        public static TempMediaLocation CreateTempMediaLocation(Guid fileId, DateTime expires)
-        {
-            using (var db = new HonyomiContext())
-            {
-                var existing = db.TempMediaLocations.FirstOrDefault(x => x.FileId == fileId);
-                if (existing != null)
-                {
-                    existing.Expires = expires;
-                    db.SaveChanges();
-                    return existing;
-                }
 
-                var res =  db.TempMediaLocations.Add(new TempMediaLocation() {Expires = expires, FileId = fileId});
-                return res.Entity;
-            }
-        }
-        public static TempMediaLocation GetTempMediaLocation(Guid id)
-        {
-            using (var db = new HonyomiContext())
-            {
-                return db.TempMediaLocations.SingleOrDefault(x => x.Id == id);
-            }
-        }
-
-        public static void CleanTempMediaFiles()
-        {
-            using (var db = new HonyomiContext())
-            {
-     
-                var tempMediaLocations = db.TempMediaLocations.Where(x => x.Expires < DateTime.Now);    
-                db.TempMediaLocations.RemoveRange(tempMediaLocations);
-                db.SaveChanges();
-            }
-        }
     }
 }

@@ -20,7 +20,6 @@ namespace DataLib
         public DbSet<FileProgress> FileProgresses { get; set; }
         public DbSet<HonyomiConfig> Configs { get; set; }
         public DbSet<WatchDirectory> WatchDirectories { get; set; }
-        public DbSet<TempMediaLocation> TempMediaLocations { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

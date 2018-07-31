@@ -17,13 +17,12 @@ type AuthMsg
     | LoginFailure String
 
 
-type PlaybackMsg
-    = ReserveTrackRequest ServerFile
-    | ReserveTrackSuccess ( ServerFile, FileReservation )
-    | ReserveTrackError String
 
-
-
+--
+-- type PlaybackMsg
+--     = ReserveTrackRequest ServerFile
+--     | ReserveTrackSuccess ( ServerFile, FileReservation )
+--     | ReserveTrackError String
 --todo: figure out how the loading process will work, and how to wire up ports to do so
 
 
@@ -58,5 +57,5 @@ type Msg
     | Auth AuthMsg
     | Library LibraryMsg
     | Config ConfigMsg
-    | Playback PlaybackMsg
+      -- | Playback PlaybackMsg
     | Route RouteMsg

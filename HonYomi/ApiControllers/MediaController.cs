@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DataLib;
 using HonYomi.Exposed;
+using Microsoft.AspNetCore.Antiforgery.Internal;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 
 namespace HonYomi.ApiControllers
@@ -14,41 +19,28 @@ namespace HonYomi.ApiControllers
     [ApiController]
     public class MediaController : Controller
     {
+
         [HttpGet]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Route("/api/tracks/reserve/{guid}")]
-        public IActionResult ReserveAudioFile(Guid fileId)
-        {
-            try
-            {
-                TempMediaLocation tempMediaLocation =
-                    DataAccess.CreateTempMediaLocation(fileId, DateTime.Now + TimeSpan.FromHours(12));
-                return Ok(new FileReservation{Url = $"/api/tracks/stream/{tempMediaLocation.Id}", FileId = fileId, MimeType = tempMediaLocation.File.MimeType});
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-        }
-        
-        [HttpGet]
-        [Route("/api/tracks/stream/{id}")]
+        [Route("/api/tracks/stream/{location}")]
         //accepts byte range headers
-        public IActionResult GetAudioFile(Guid id)
+        public IActionResult GetAudioFile(string location)
         {
+            ( Guid id, string token ) = SplitTrackAddress(location);
+            if (!Validate(token)) return BadRequest("Invalid JWT");
             string path, mimeType;
             using (var db = new HonyomiContext())
             {
-                var file =  db.TempMediaLocations.Include(x => x.File).FirstOrDefault(x => x.Id == id);
-                if (file == null || file.Expires < DateTime.Now)
+                var file = db.Files.FirstOrDefault(x => x.IndexedFileId == id);
+                if (file == null)
                 {
                     return NotFound();
                 }
-                path = file.File.FilePath;
-                mimeType = file.File.MimeType;
-            }
-            return File(System.IO.File.OpenRead(path), mimeType, true);
 
+                path     = file.FilePath;
+                mimeType = file.MimeType;
+            }
+
+            return File(System.IO.File.OpenRead(path), mimeType, true);
         }
 
         [HttpGet]
@@ -58,9 +50,7 @@ namespace HonYomi.ApiControllers
         {
             try
             {
-        
-                    return Json( DataAccess.GetUserFileProgress(User.Identity.Name, trackId));
-                
+                return Json(DataAccess.GetUserFileProgress(User.Identity.Name, trackId));
             }
             catch (Exception)
             {
@@ -81,9 +71,9 @@ namespace HonYomi.ApiControllers
                         db.FileProgresses.SingleOrDefault(x => x.UserId == User.Identity.Name && x.FileId == trackId);
                     if (prog == null)
                     {
-                         db.FileProgresses.AddAsync(
+                        db.FileProgresses.AddAsync(
                             new FileProgress {FileId = trackId, UserId = User.Identity.Name, Progress = seconds});
-                         db.SaveChanges();
+                        db.SaveChanges();
                     }
                     else
                     {
@@ -106,6 +96,62 @@ namespace HonYomi.ApiControllers
         {
             const string path = "../HonYomi.Tests/long.mp3";
             return File(System.IO.File.OpenRead(path), "audio/mpeg", true);
+        }
+/*
+ * stored as 
+ */
+        private (Guid id, string jwt) SplitTrackAddress(string location)
+        {
+            try
+            {
+                string decoded = Encoding.UTF8.GetString(Convert.FromBase64String(location));
+                string[] parts = decoded.Split(':');
+                return ( Guid.Parse(parts[0]), parts[1] );
+            }
+            catch (Exception)
+            {
+                return ( Guid.Empty, "" );
+            }
+        }
+        
+        private static bool Validate(string jwt)
+        {
+            var validationParameters = new TokenValidationParameters
+            {
+                // Clock skew compensates for server time drift.
+                // We recommend 5 minutes or less:
+                ClockSkew = TimeSpan.FromMinutes(5),
+                // Specify the key used to sign the token:
+                IssuerSigningKey    = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(RuntimeConstants.JwtKey)),
+                RequireSignedTokens = true,
+                // Ensure the token hasn't expired:
+                RequireExpirationTime = true,
+                ValidateLifetime      = true,
+                // Ensure the token audience matches our audience value (default true):
+                ValidateAudience = true,
+                ValidAudience    = RuntimeConstants.JwtIssuer,
+                // Ensure the token was issued by a trusted authorization server (default true):
+                ValidateIssuer = true,
+                ValidIssuer    = RuntimeConstants.JwtIssuer
+            };
+
+            try
+            {
+                var claimsPrincipal = new JwtSecurityTokenHandler()
+                    .ValidateToken(jwt, validationParameters, out var rawValidatedToken);
+
+                return true;
+                // Or, you can return the ClaimsPrincipal
+                // (which has the JWT properties automatically mapped to .NET claims)
+            }
+            catch (SecurityTokenValidationException stvex)
+            {
+                return false;
+            }
+            catch (ArgumentException argex)
+            {
+                return false;
+            }
         }
     }
 }
