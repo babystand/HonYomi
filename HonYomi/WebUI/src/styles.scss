@@ -124,35 +124,63 @@ button {
     height: 35px;
     text-align: center;
 }
+$book-grid-columns: 40px auto auto 70px;
 
 #library-books {
+  .book-grid-header{
+    background: #111111;
+    color: $light;
+    font-size: 12px;
+
+    display: grid;
+    grid-template-columns: $book-grid-columns;
+    div{
+      text-align: center;
+      border-right: solid 1px #403F40;
+      &:last-of-type {
+          border-right: none;
+        }
+    }
+    #book-play-col-header {
+        grid-column: 1;
+    }
+    #book-title-col-header {
+        grid-column: 2;
+    }
+    #book-id-col-header {
+        grid-column: 3;
+    }
+    #book-tracks-col-header {
+        grid-column: 4;
+    }
+  }
     .book-grid {
         background: $medium;
         color: $light;
         width: 100%;
-        table-layout: fixed;
         font-size: 12px;
         display: grid;
-        grid-template-columns: 40px auto auto 40px;
-        grid-template-rows: 25px auto;
-        .book-grid-header {
-            grid-row: 1;
-            grid-column-start: 1;
-            grid-column-end: 4;
 
+        .book-row{
+          display: grid;
+          grid-template-columns: $book-grid-columns;
         }
-        #book-play-col-header {
-            grid-column: 1;
+        .book-play-col, .book-title-col, .book-id-col, .book-tracks-col{
+          text-align: center;
         }
-        #book-title-col-header {
-            grid-column: 2;
+        .book-play-col{
+          grid-column: 1;
         }
-        #book-id-col-header {
-            grid-column: 3;
+        .book-title-col{
+          grid-column: 2;
         }
-        #book-tracks-col-header {
-            grid-column: 4;
+        .book-id-col{
+          grid-column: 3;
         }
+        .book-tracks-col{
+          grid-column: 4;
+        }
+
         thead {
             background: #111111;
             tr {

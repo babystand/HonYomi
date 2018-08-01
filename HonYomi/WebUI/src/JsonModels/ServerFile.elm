@@ -9,6 +9,7 @@ type alias ServerFile =
     , title : Maybe String
     , bookGuid : String
     , bookTitle : Maybe String
+    , trackIndex : Int
     , progressSeconds : Float
     , mediaType : String
     }
@@ -16,7 +17,7 @@ type alias ServerFile =
 
 defaultServerFile : ServerFile
 defaultServerFile =
-    { guid = "", title = Just "", bookGuid = "", bookTitle = Just "", progressSeconds = 0, mediaType = "" }
+    { guid = "", title = Just "", bookGuid = "", bookTitle = Just "", trackIndex = 0, progressSeconds = 0, mediaType = "" }
 
 
 decodeServerFile : Json.Decode.Decoder ServerFile
@@ -26,5 +27,6 @@ decodeServerFile =
         |> Json.Decode.Pipeline.required "title" (Json.Decode.maybe Json.Decode.string)
         |> Json.Decode.Pipeline.required "bookGuid" Json.Decode.string
         |> Json.Decode.Pipeline.required "bookTitle" (Json.Decode.maybe Json.Decode.string)
+        |> Json.Decode.Pipeline.required "trackIndex" Json.Decode.int
         |> Json.Decode.Pipeline.required "progressSeconds" Json.Decode.float
         |> Json.Decode.Pipeline.required "mediaType" Json.Decode.string

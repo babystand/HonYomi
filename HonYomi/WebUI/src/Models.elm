@@ -23,6 +23,9 @@ type alias LoginModel =
 
 type alias PlaybackModel =
     { guid : String
+    , title : String
+    , bookTitle : String
+    , trackIndex : Int
     , url : String
     , mediaType : String
     , currentTime : Float
@@ -77,12 +80,12 @@ initMainModel =
 
 getPlayback : Model -> PlaybackModel
 getPlayback model =
-    model.playback |> withDefault { guid = "", url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }
+    model.playback |> withDefault { guid = "", title = "", bookTitle = "", trackIndex = 0, url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }
 
 
 setPlayback : ServerFile -> Token -> PlaybackModel -> PlaybackModel
 setPlayback file tok model =
-    { guid = file.guid, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, currentTime = file.progressSeconds, duration = 0.0, ended = False }
+    { guid = file.guid, title = withDefault "" file.title, bookTitle = withDefault "" file.bookTitle, trackIndex = file.trackIndex, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, currentTime = file.progressSeconds, duration = 0.0, ended = False }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel

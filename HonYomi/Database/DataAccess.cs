@@ -108,6 +108,7 @@ namespace DataLib
                                               Title     = file.Title,
                                               BookGuid  = file.BookId,
                                               BookTitle = file.Book.Title,
+                                              TrackIndex = file.TrackIndex,
                                               MediaType = file.MimeType
                                           };
                 FileProgress fProg =  db.FileProgresses.SingleOrDefault(x => x.FileId == fileId && x.UserId == userId);
