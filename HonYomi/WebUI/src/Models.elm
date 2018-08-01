@@ -4,10 +4,12 @@
 module Models exposing (..)
 
 import Array
+import Base64
 import Exts.Array
 import Maybe exposing (withDefault)
 import ServerBook
 import ServerConfig exposing (ServerConfig)
+import ServerFile exposing (..)
 import UserCreds exposing (UserCreds)
 
 
@@ -78,6 +80,11 @@ getPlayback model =
     model.playback |> withDefault { guid = "", url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }
 
 
+setPlayback : ServerFile -> Token -> PlaybackModel -> PlaybackModel
+setPlayback file tok model =
+    { guid = file.guid, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, currentTime = file.progressSeconds, duration = 0.0, ended = False }
+
+
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel
 removeWatchDirectory index model =
     let
@@ -124,3 +131,11 @@ modifyWatchDirectory index newPath model =
             { conf | watchDirectories = model.config.watchDirectories |> Array.set index new }
     in
     { model | config = newconf }
+
+
+encodeTrackUrl : Token -> String -> String
+encodeTrackUrl tok guid =
+    guid
+        ++ ":"
+        ++ tok
+        |> Base64.encode

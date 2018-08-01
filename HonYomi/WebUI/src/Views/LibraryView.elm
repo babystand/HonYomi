@@ -3,10 +3,11 @@ module LibraryView exposing (..)
 import Array exposing (Array)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
-import ServerBook exposing (ServerBook)
+import ServerBook exposing (ServerBook, getCurrentTrack)
 
 
 bookRow : Int -> ServerBook -> Html Msg
@@ -20,7 +21,8 @@ bookRow index book =
                 class "tableRowAlt"
     in
     tr [ class "book-row", rowClass ]
-        [ td [] [ text <| withDefault book.guid book.title ]
+        [ td [ onClick <| Playback (SetTrack <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
+        , td [] [ text <| withDefault book.guid book.title ]
         , td [] [ text <| book.guid ]
         , td [] [ text <| toString <| Array.length book.fileProgresses ]
         ]
@@ -31,23 +33,13 @@ bookTable books =
     table [ class "book-table" ]
         [ thead [ class "fixed-table-header" ]
             [ tr []
-                [ th [] [ text "Title" ]
+                [ th [] []
+                , th [] [ text "Title" ]
                 , th [] [ text "Id" ]
                 , th [] [ text "Tracks" ]
                 ]
             ]
         , tbody [ class "scrollable-table" ] (Array.toList <| Array.indexedMap bookRow books)
-        ]
-
-
-bookView : ServerBook -> Html Msg
-bookView serverBook =
-    div [ class "book", id serverBook.guid ]
-        [ div [ class "book-row" ]
-            [ span [ class "book-title" ] [ text <| withDefault serverBook.guid serverBook.title ]
-            , span [ class "separator" ] [ text " | " ]
-            , span [ class "book-file-count" ] [ text <| (\x -> "Tracks: " ++ x) <| toString <| Array.length serverBook.fileProgresses ]
-            ]
         ]
 
 

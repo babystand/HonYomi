@@ -5,9 +5,12 @@ import Html exposing (..)
 import LayoutView exposing (..)
 import LibraryView exposing (libraryPageView)
 import LoginView exposing (loginPageView)
+import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
+import Ports exposing (..)
 import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, refreshRequest)
+import Time
 
 
 type alias Page =
@@ -156,6 +159,35 @@ updateConfigPage model config cpage =
             ( { model | page = ConfigPage newPage }, Cmd.none )
 
 
+updatePlayback : Model -> PlaybackMsg -> ( Model, Cmd Msg )
+updatePlayback model msg =
+    let
+        pmod =
+            getPlayback model
+    in
+    case msg of
+        SetTrack mfile ->
+            case mfile of
+                Just file ->
+                    updatePlayback { model | playback = Just <| setPlayback file model.token pmod } ReloadTrack
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        ReloadTrack ->
+            ( model, loadAudioSource () )
+
+        ProgressChanged progress ->
+            let
+                newPlayback =
+                    Just <| { pmod | currentTime = progress }
+            in
+            ( { model | playback = newPlayback }, Cmd.none )
+
+        Messages.UpdatePostion ->
+            ( model, getAudioProgress () )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case ( message, model.page ) of
@@ -186,6 +218,12 @@ update message model =
         ( Config config, _ ) ->
             ( model, Cmd.none )
 
+        ( Playback _, LoginPage _ ) ->
+            ( model, Cmd.none )
+
+        ( Playback pmsg, _ ) ->
+            updatePlayback model pmsg
+
         ( Route route, _ ) ->
             case route of
                 RouteToLibrary ->
@@ -213,11 +251,19 @@ view model =
     applyLayout model <| getPageView model
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ audioProgress (Playback << ProgressChanged)
+        , Time.every Time.second <| \_ -> Playback UpdatePostion
+        ]
+
+
 main : Program Never Model Msg
 main =
     Html.program
         { init = init
         , update = update
         , view = view
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }

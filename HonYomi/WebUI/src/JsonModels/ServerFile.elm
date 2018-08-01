@@ -10,14 +10,13 @@ type alias ServerFile =
     , bookGuid : String
     , bookTitle : Maybe String
     , progressSeconds : Float
-
-    --todo: file info
+    , mediaType : String
     }
 
 
 defaultServerFile : ServerFile
 defaultServerFile =
-    { guid = "", title = Just "", bookGuid = "", bookTitle = Just "", progressSeconds = 0 }
+    { guid = "", title = Just "", bookGuid = "", bookTitle = Just "", progressSeconds = 0, mediaType = "" }
 
 
 decodeServerFile : Json.Decode.Decoder ServerFile
@@ -28,3 +27,4 @@ decodeServerFile =
         |> Json.Decode.Pipeline.required "bookGuid" Json.Decode.string
         |> Json.Decode.Pipeline.required "bookTitle" (Json.Decode.maybe Json.Decode.string)
         |> Json.Decode.Pipeline.required "progressSeconds" Json.Decode.float
+        |> Json.Decode.Pipeline.required "mediaType" Json.Decode.string

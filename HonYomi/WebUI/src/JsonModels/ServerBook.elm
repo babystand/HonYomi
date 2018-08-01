@@ -3,7 +3,7 @@ module ServerBook exposing (..)
 import Array exposing (Array)
 import Json.Decode
 import Json.Decode.Pipeline
-import ServerFile
+import ServerFile exposing (..)
 
 
 type alias Library =
@@ -16,6 +16,12 @@ type alias ServerBook =
     , title : Maybe String
     , fileProgresses : Array ServerFile.ServerFile
     }
+
+
+getCurrentTrack : ServerBook -> Maybe ServerFile
+getCurrentTrack book =
+    Array.filter (\f -> f.guid == book.currentTrackGuid) book.fileProgresses
+        |> Array.get 0
 
 
 decodeServerBook : Json.Decode.Decoder ServerBook

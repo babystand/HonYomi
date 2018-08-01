@@ -107,7 +107,8 @@ namespace DataLib
                                               Guid      = fileId,
                                               Title     = file.Title,
                                               BookGuid  = file.BookId,
-                                              BookTitle = file.Book.Title
+                                              BookTitle = file.Book.Title,
+                                              MediaType = file.MimeType
                                           };
                 FileProgress fProg =  db.FileProgresses.SingleOrDefault(x => x.FileId == fileId && x.UserId == userId);
                 if (fProg == null)

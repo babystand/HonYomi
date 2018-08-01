@@ -6,6 +6,7 @@ import Html.Attributes exposing (class, id)
 import Html.Events exposing (onClick, onInput)
 import Messages exposing (..)
 import Models exposing (..)
+import PlaybackView exposing (playbackView)
 
 
 getPageName : Page -> String
@@ -32,7 +33,7 @@ applyLayout model html =
             html
 
         _ ->
-            layoutView pagename html
+            layoutView pagename html (playbackView <| getPlayback model)
 
 
 getRoutes : List ( Html Msg, Msg )
@@ -65,9 +66,10 @@ bodyLayout pagename html =
         ]
 
 
-layoutView : String -> Html Msg -> Html Msg
-layoutView pagename html =
+layoutView : String -> Html Msg -> Html Msg -> Html Msg
+layoutView pagename html playbackHtml =
     div [ class "page-wrapper" ]
         [ pageHeader
         , bodyLayout pagename html
+        , playbackHtml
         ]
