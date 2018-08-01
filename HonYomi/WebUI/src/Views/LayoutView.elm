@@ -22,6 +22,16 @@ getPageName page =
             "Config"
 
 
+getPlaybackView : Model -> Html Msg
+getPlaybackView model =
+    case model.playback of
+        Just p ->
+            playbackView p
+
+        Nothing ->
+            text ""
+
+
 applyLayout : Model -> Html Msg -> Html Msg
 applyLayout model html =
     let
@@ -33,7 +43,7 @@ applyLayout model html =
             html
 
         _ ->
-            layoutView pagename html (playbackView <| getPlayback model)
+            layoutView pagename html (getPlaybackView model)
 
 
 getRoutes : List ( Html Msg, Msg )
