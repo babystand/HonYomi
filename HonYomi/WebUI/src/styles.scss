@@ -93,36 +93,36 @@ button {
         margin: 15px;
         margin-top: 25px;
         padding: 10px;
-        input {
-            margin: auto;
-            width: 250px;
-            height: 30px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 110%;
-            margin: 5px 0 5px 0;
-            background: $dark;
-            border: none;
-            color: $light;
-        }
-        button {
-            margin: auto;
-            margin-top: 25px;
-            background: $dark;
-            border-radius: 5px;
-            color: $light;
-            font-size: 1.1em;
-            font-weight: 700;
-            border-style: none;
-            border: none;
-            border-color: $medium;
-            width: 150px;
-            height: 35px;
-            text-align: center;
-        }
+
     }
 }
-
+input {
+    margin: auto;
+    width: 250px;
+    height: 30px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 110%;
+    margin: 5px 0 5px 0;
+    background: $dark;
+    border: none;
+    color: $light;
+}
+button {
+    margin: auto;
+    margin-top: 25px;
+    background: $dark;
+    border-radius: 5px;
+    color: $light;
+    font-size: 1.1em;
+    font-weight: 700;
+    border-style: none;
+    border: none;
+    border-color: $medium;
+    width: 150px;
+    height: 35px;
+    text-align: center;
+}
 #library-books {
     .book-table {
         background: $medium;
@@ -192,4 +192,17 @@ button {
 
 .hidden {
     display: none;
+}
+#playback-section{
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #111111;
+  #player{
+    margin: auto;
+    max-width:1080px;
+  }
+}
+#audio{
+  width: 100%;
 }
