@@ -1,5 +1,5 @@
 @import '~purecss/build/pure.css';
-$white:#E3E2E2;
+$white: #E3E2E2;
 $light: #CCCBCB;
 $medium: #696B6B;
 $dark: #403F40;
@@ -9,7 +9,7 @@ $pink: #FF5672;
 $green: #C6ED68;
 $blue: #A1E8E5;
 body {
-    background-color: $black;
+    background-color: #0f0f0f;
     margin-top: 20px;
 }
 
@@ -47,6 +47,7 @@ button {
     margin: auto;
     max-width: 1080px;
     min-width: 600px;
+    border: solid 5px #151515;
 }
 
 .page-header {
@@ -57,7 +58,8 @@ button {
 }
 
 .nav-routes {
-    background: #111111;
+    background: #101010;
+    border-bottom: solid 1px #171717;
     color: $light;
     height: 25px;
     #routes {
@@ -90,8 +92,7 @@ button {
     color: $light;
     border-radius: 5px;
     #login-inner {
-        margin: 15px;
-        margin-top: 25px;
+        margin: 25px 15px 15px;
         padding: 10px;
     }
 }
@@ -103,15 +104,14 @@ input {
     text-align: center;
     font-weight: bold;
     font-size: 110%;
-    margin: 5px 0 5px 0;
+    margin: 5px 0;
     background: $dark;
     border: none;
     color: $light;
 }
 
 button {
-    margin: auto;
-    margin-top: 25px;
+    margin: 25px auto auto;
     background: $dark;
     border-radius: 5px;
     color: $light;
@@ -124,36 +124,35 @@ button {
     height: 35px;
     text-align: center;
 }
+
 $book-grid-columns: 40px auto auto 70px;
-
 #library-books {
-  .book-grid-header{
-    background: #111111;
-    color: $light;
-    font-size: 12px;
-
-    display: grid;
-    grid-template-columns: $book-grid-columns;
-    div{
-      text-align: center;
-      border-right: solid 1px #403F40;
-      &:last-of-type {
-          border-right: none;
+    .book-grid-header {
+        background: #111111;
+        color: $light;
+        font-size: 12px;
+        display: grid;
+        grid-template-columns: $book-grid-columns;
+        div {
+            text-align: center;
+            border-right: solid 1px #403F40;
+            &:last-of-type {
+                border-right: none;
+            }
+        }
+        #book-play-col-header {
+            grid-column: 1;
+        }
+        #book-title-col-header {
+            grid-column: 2;
+        }
+        #book-id-col-header {
+            grid-column: 3;
+        }
+        #book-tracks-col-header {
+            grid-column: 4;
         }
     }
-    #book-play-col-header {
-        grid-column: 1;
-    }
-    #book-title-col-header {
-        grid-column: 2;
-    }
-    #book-id-col-header {
-        grid-column: 3;
-    }
-    #book-tracks-col-header {
-        grid-column: 4;
-    }
-  }
     .book-grid {
         background: $medium;
         color: $light;
@@ -163,26 +162,78 @@ $book-grid-columns: 40px auto auto 70px;
         max-height: 80%;
         overflow-y: auto;
         width: 100%;
-        .book-row{
-          display: grid;
-          grid-template-columns: $book-grid-columns;
+        .book-row {
+            display: grid;
+            grid-template-columns: $book-grid-columns;
+            background: #191919;
         }
-        .book-play-col, .book-title-col, .book-id-col, .book-tracks-col{
-          text-align: center;
+        .book-row-alt {
+            background: #242424;
         }
-        .book-play-col{
-          grid-column: 1;
+        >.selected-book-row {
+            background: #666666;
+            color: #111111;
         }
-        .book-title-col{
-          grid-column: 2;
+        .book-id-col,
+        .book-play-col,
+        .book-title-col,
+        .book-tracks-col {
+            text-align: center;
         }
-        .book-id-col{
-          grid-column: 3;
+        .book-play-col {
+            grid-column: 1;
         }
-        .book-tracks-col{
-          grid-column: 4;
+        .book-title-col {
+            grid-column: 2;
         }
-
+        .book-id-col {
+            grid-column: 3;
+        }
+        .book-tracks-col {
+            grid-column: 4;
+        }
+    }
+    .file-rows {
+        grid-column-start: 1;
+        grid-column-end: 5;
+color: $light;
+        .file-row {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 20px 20px auto auto auto;
+            grid-template-rows: auto;
+            text-align: center;
+            background: #303030;
+        }
+        .file-row-alt{
+          background: #353535;
+        }
+        .file-rows-header {
+            background: #606060;
+            color: #111111;
+            div {
+                text-align: center;
+                border-right: solid 1px #777777;
+                &:last-of-type {
+                    border-right: none;
+                }
+            }
+        }
+        .file-gap-col {
+            grid-column: 1;
+        }
+        .file-play-col {
+            grid-column: 2;
+        }
+        .file-title-col {
+            grid-column: 3;
+        }
+        .file-id-col {
+            grid-column: 4;
+        }
+        .file-progress-col {
+            grid-column: 5;
+        }
     }
 }
 

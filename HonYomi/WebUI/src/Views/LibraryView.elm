@@ -1,6 +1,7 @@
 module LibraryView exposing (..)
 
-import Array exposing (Array)
+import Array exposing (..)
+import Exts.Maybe exposing (isJust)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -16,14 +17,58 @@ setBookOnClick book =
     onClick <| (Library <| SetSelectedBook book)
 
 
-fileRowView : ServerFile -> Html Msg
-fileRowView file =
-    div [] [ text "row" ]
+unsetBookOnClick : Html.Attribute Msg
+unsetBookOnClick =
+    onClick <| Library UnsetBook
+
+
+bookOnClick : Maybe ServerBook -> ServerBook -> Html.Attribute Msg
+bookOnClick mbook book =
+    case mbook of
+        Just jb ->
+            if jb == book then
+                unsetBookOnClick
+
+            else
+                setBookOnClick book
+
+        Nothing ->
+            setBookOnClick book
+
+
+fileRowView : Int -> ServerFile -> Html Msg
+fileRowView index file =
+    let
+        rowClass =
+            if index % 2 == 0 then
+                class "file-row"
+
+            else
+                class "file-row file-row-alt"
+    in
+    div [ rowClass ]
+        [ div [ class "file-gap-col" ] []
+        , div [ class "file-play-col" ] [ i [ class "fas fa-play" ] [] ]
+        , div [ class "file-title-col" ] [ text <| withDefault "" file.title ]
+        , div [ class "file-id-col" ] [ text <| file.guid ]
+        , div [ class "file-progress-col" ] [ text <| toString file.progressSeconds ]
+        ]
 
 
 selectedBookView : ServerBook -> Html Msg
 selectedBookView book =
-    div [] (Array.toList <| Array.map (\f -> fileRowView f) book.fileProgresses)
+    div [ class "file-rows" ] <|
+        [ div [ class "file-row file-rows-header" ]
+            [ div [ class "file-gap-col" ] []
+            , div [ class "file-play-col" ] []
+            , div [ class "file-title-col" ] [ text "Title" ]
+            , div [ class "file-id-col" ] [ text "Id" ]
+            , div [ class "file-progress-col" ] [ text "Progress" ]
+            ]
+        ]
+            ++ (Array.toList <|
+                    Array.indexedMap fileRowView book.fileProgresses
+               )
 
 
 bookRow : Maybe ServerBook -> Int -> ServerBook -> Html Msg
@@ -31,26 +76,37 @@ bookRow selected index book =
     let
         rowClass =
             if index % 2 == 0 then
-                class "tableRow"
+                class "book-row"
 
             else
-                class "tableRowAlt"
+                class "book-row book-row-alt"
+
+        isSelected =
+            case selected of
+                Just sel ->
+                    sel == book
+
+                _ ->
+                    False
     in
-    div [ class "book-row", rowClass ]
+    div
+        [ rowClass
+        , class <|
+            if isSelected then
+                "selected-book-row"
+
+            else
+                ""
+        ]
         [ div [ class "book-play-col", onClick <| Playback (SetTrack <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
-        , div [ class "book-title-col", setBookOnClick book ] [ text <| withDefault book.guid book.title ]
-        , div [ class "book-id-col", setBookOnClick book ] [ text <| book.guid ]
-        , div [ class "book-tracks-col", setBookOnClick book ] [ text <| toString <| Array.length book.fileProgresses ]
-        , case selected of
-            Just s ->
-                if s == book then
-                    selectedBookView book
+        , div [ class "book-title-col", bookOnClick selected book ] [ text <| withDefault book.guid book.title ]
+        , div [ class "book-id-col", bookOnClick selected book ] [ text <| book.guid ]
+        , div [ class "book-tracks-col", bookOnClick selected book ] [ text <| toString <| Array.length book.fileProgresses ]
+        , if isSelected then
+            selectedBookView book
 
-                else
-                    text ""
-
-            _ ->
-                text ""
+          else
+            text ""
         ]
 
 
