@@ -29,6 +29,9 @@ type PlaybackMsg
     | Paused
     | ScrubTo Float
     | SetCurrentTime Float
+    | SaveTrackPosition
+    | SaveTrackError
+    | SaveTrackSuccess
 
 
 

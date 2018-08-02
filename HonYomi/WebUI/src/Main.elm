@@ -9,8 +9,7 @@ import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import Ports exposing (..)
-import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, refreshRequest)
-import Time
+import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, refreshRequest, setProgressRequest)
 
 
 type alias Page =
@@ -187,8 +186,15 @@ updatePlayback model msg =
             let
                 newPlayback =
                     Just <| { pmod | currentTime = progress }
+
+                newModel =
+                    { model | playback = newPlayback }
             in
-            ( { model | playback = newPlayback }, Cmd.none )
+            if abs (progress - pmod.currentTime) < 1 && abs (progress - pmod.savedTime) > 5 then
+                updatePlayback newModel SaveTrackPosition
+
+            else
+                ( newModel, Cmd.none )
 
         DurationChanged dur ->
             let
@@ -229,6 +235,15 @@ updatePlayback model msg =
 
         SetCurrentTime f ->
             ( model, setCurrentTime f )
+
+        SaveTrackPosition ->
+            ( model, setProgressRequest model.token pmod )
+
+        SaveTrackError ->
+            ( model, Cmd.none )
+
+        SaveTrackSuccess ->
+            ( model, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

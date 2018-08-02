@@ -61,7 +61,7 @@ namespace HonYomi.ApiControllers
         [HttpGet]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Route("/api/tracks/progress/set/{trackId}/{seconds}")]
-        public IActionResult SetTrackProgress(Guid trackId, uint seconds)
+        public IActionResult SetTrackProgress(Guid trackId, double seconds)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace HonYomi.ApiControllers
                         db.FileProgresses.SingleOrDefault(x => x.UserId == User.Identity.Name && x.FileId == trackId);
                     if (prog == null)
                     {
-                        db.FileProgresses.AddAsync(
+                        db.FileProgresses.Add(
                             new FileProgress {FileId = trackId, UserId = User.Identity.Name, Progress = seconds});
                         db.SaveChanges();
                     }
@@ -81,7 +81,7 @@ namespace HonYomi.ApiControllers
                         db.SaveChanges();
                     }
 
-                    return Ok();
+                    return Json(true);
                 }
             }
             catch (Exception)

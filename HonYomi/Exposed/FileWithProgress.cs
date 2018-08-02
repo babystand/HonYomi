@@ -9,7 +9,7 @@ namespace HonYomi.Exposed
         public Guid BookGuid { get; set; }
         public string BookTitle { get; set; }
         public int TrackIndex {get;set;}
-        public uint ProgressSeconds { get; set; }
+        public double ProgressSeconds { get; set; }
         public string MediaType { get; set; }
     }
 }

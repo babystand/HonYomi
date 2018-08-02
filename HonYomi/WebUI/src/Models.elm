@@ -28,6 +28,7 @@ type alias PlaybackModel =
     , trackIndex : Int
     , url : String
     , mediaType : String
+    , savedTime : Float
     , currentTime : Float
     , duration : Float
     , ended : Bool
@@ -91,12 +92,12 @@ unsetSelectedBook model =
 
 getPlayback : Model -> PlaybackModel
 getPlayback model =
-    model.playback |> withDefault { guid = "", title = "", bookTitle = "", trackIndex = 0, url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False, isPlaying = False }
+    model.playback |> withDefault { guid = "", title = "", bookTitle = "", trackIndex = 0, url = "", mediaType = "", savedTime = 0, currentTime = 0.0, duration = 0.0, ended = False, isPlaying = False }
 
 
 setPlayback : ServerFile -> Token -> PlaybackModel -> PlaybackModel
 setPlayback file tok model =
-    { guid = file.guid, title = withDefault "" file.title, bookTitle = withDefault "" file.bookTitle, trackIndex = file.trackIndex, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, currentTime = file.progressSeconds, duration = 0.0, ended = False, isPlaying = False }
+    { guid = file.guid, title = withDefault "" file.title, bookTitle = withDefault "" file.bookTitle, trackIndex = file.trackIndex, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, savedTime = file.progressSeconds, currentTime = file.progressSeconds, duration = 0.0, ended = False, isPlaying = False }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel

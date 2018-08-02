@@ -8,7 +8,7 @@ import Json.Decode
 import JsonToken exposing (..)
 import Jwt
 import Messages as M
-import Models
+import Models exposing (PlaybackModel)
 import Result
 import ServerBook
 import ServerConfig
@@ -143,3 +143,20 @@ configPostRequest : Models.Token -> ServerConfig.ServerConfig -> Cmd M.Msg
 configPostRequest tok config =
     Http.send mapConfigRequest <|
         Jwt.post tok "/api/db/config" (jsonBody <| ServerConfig.encodeServerConfig config) ServerConfig.decodeServerConfig
+
+
+mapProgressRequest : Result Http.Error a -> M.Msg
+mapProgressRequest result =
+    case result of
+        Ok _ ->
+            M.Playback M.SaveTrackSuccess
+
+        Err _ ->
+            M.Playback M.SaveTrackError
+
+
+setProgressRequest : Models.Token -> PlaybackModel -> Cmd M.Msg
+setProgressRequest tok model =
+    Http.send mapProgressRequest <|
+        Jwt.get tok ("/api/tracks/progress/set/" ++ model.guid ++ "/" ++ toString model.currentTime) <|
+            Json.Decode.bool
