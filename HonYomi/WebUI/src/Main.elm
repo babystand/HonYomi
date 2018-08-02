@@ -190,10 +190,37 @@ updatePlayback model msg =
             in
             ( { model | playback = newPlayback }, Cmd.none )
 
+        DurationChanged dur ->
+            let
+                newPlayback =
+                    Just <| { pmod | duration = dur }
+            in
+            ( { model | playback = newPlayback }, Cmd.none )
+
         Ended ->
             let
                 newPlayback =
                     Just <| { pmod | ended = True }
+            in
+            ( { model | playback = newPlayback }, Cmd.none )
+
+        Play ->
+            ( model, playAudio () )
+
+        Pause ->
+            ( model, pauseAudio () )
+
+        Played ->
+            let
+                newPlayback =
+                    Just <| { pmod | isPlaying = True }
+            in
+            ( { model | playback = newPlayback }, Cmd.none )
+
+        Paused ->
+            let
+                newPlayback =
+                    Just <| { pmod | isPlaying = False }
             in
             ( { model | playback = newPlayback }, Cmd.none )
 
@@ -265,7 +292,10 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ audioProgress (Playback << ProgressChanged)
+        , durationChange (Playback << DurationChanged)
         , onEnded (\_ -> Playback Ended)
+        , onPlayed (\_ -> Playback Played)
+        , onPaused (\_ -> Playback Paused)
 
         -- , Time.every Time.second <| \_ -> Playback UpdatePostion
         ]

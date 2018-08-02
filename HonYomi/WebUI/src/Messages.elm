@@ -21,7 +21,12 @@ type PlaybackMsg
     = SetTrack (Maybe ServerFile)
     | ReloadTrack
     | ProgressChanged Float
+    | DurationChanged Float
     | Ended
+    | Play
+    | Pause
+    | Played
+    | Paused
 
 
 
