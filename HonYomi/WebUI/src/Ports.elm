@@ -10,6 +10,9 @@ port audioProgress : (Float -> msg) -> Sub msg
 port durationChange : (Float -> msg) -> Sub msg
 
 
+port onScrub : (Float -> msg) -> Sub msg
+
+
 port onEnded : (() -> msg) -> Sub msg
 
 
@@ -23,3 +26,6 @@ port playAudio : () -> Cmd msg
 
 
 port pauseAudio : () -> Cmd msg
+
+
+port setCurrentTime : Float -> Cmd msg

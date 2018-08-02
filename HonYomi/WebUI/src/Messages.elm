@@ -27,6 +27,8 @@ type PlaybackMsg
     | Pause
     | Played
     | Paused
+    | ScrubTo Float
+    | SetCurrentTime Float
 
 
 

@@ -10,3 +10,9 @@ export function pause(){
     audio.pause();
   }
 }
+export function setCurrentTime(f){
+  let audio = document.getElementById('audio');
+  if(audio !== null && audio !== undefined){
+    audio.currentTime = f;
+  }
+}

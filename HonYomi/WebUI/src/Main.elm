@@ -224,6 +224,12 @@ updatePlayback model msg =
             in
             ( { model | playback = newPlayback }, Cmd.none )
 
+        ScrubTo f ->
+            updatePlayback model (SetCurrentTime <| f * pmod.duration)
+
+        SetCurrentTime f ->
+            ( model, setCurrentTime f )
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
@@ -296,6 +302,7 @@ subscriptions model =
         , onEnded (\_ -> Playback Ended)
         , onPlayed (\_ -> Playback Played)
         , onPaused (\_ -> Playback Paused)
+        , onScrub (Playback << ScrubTo)
 
         -- , Time.every Time.second <| \_ -> Playback UpdatePostion
         ]

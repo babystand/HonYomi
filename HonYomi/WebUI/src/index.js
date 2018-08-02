@@ -17,9 +17,24 @@ function loadAudioSource (){
     audio.onplay = () => app.ports.onPlayed.send(null);
     audio.onpause = () => app.ports.onPaused.send(null);
   }
+  let progress = document.getElementById('progress-bar');
+  if(progress !== null && progress !== undefined){
+    progress.onclick = (e) => {
+      console.log(e);
+      let pPos = progress.offsetLeft;
+      let cPos = ((e.clientX - progress.getBoundingClientRect().left)/ progress.clientWidth);
+      console.log("offset left: "+progress.offsetLeft);
+      console.log("clientx: " + e.clientX);
+      console.log("cwidth: " +progress.clientWidth);
+      console.log("cpos: " +cPos);
+
+      app.ports.onScrub.send(cPos);
+    };
+  }
 }
 
 
 app.ports.loadAudioSource.subscribe(() => loadAudioSource());
 app.ports.playAudio.subscribe(() => ac.play());
 app.ports.pauseAudio.subscribe(() => ac.pause());
+app.ports.setCurrentTime.subscribe(f => ac.setCurrentTime(f));
