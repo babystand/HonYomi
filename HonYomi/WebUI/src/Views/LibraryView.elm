@@ -8,10 +8,26 @@ import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import ServerBook exposing (ServerBook, getCurrentTrack)
+import ServerFile exposing (ServerFile)
 
 
-bookRow : Int -> ServerBook -> Html Msg
-bookRow index book =
+setBookOnClick : ServerBook -> Html.Attribute Msg
+setBookOnClick book =
+    onClick <| (Library <| SetSelectedBook book)
+
+
+fileRowView : ServerFile -> Html Msg
+fileRowView file =
+    div [] [ text "row" ]
+
+
+selectedBookView : ServerBook -> Html Msg
+selectedBookView book =
+    div [] (Array.toList <| Array.map (\f -> fileRowView f) book.fileProgresses)
+
+
+bookRow : Maybe ServerBook -> Int -> ServerBook -> Html Msg
+bookRow selected index book =
     let
         rowClass =
             if index % 2 == 0 then
@@ -22,14 +38,24 @@ bookRow index book =
     in
     div [ class "book-row", rowClass ]
         [ div [ class "book-play-col", onClick <| Playback (SetTrack <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
-        , div [ class "book-title-col" ] [ text <| withDefault book.guid book.title ]
-        , div [ class "book-id-col" ] [ text <| book.guid ]
-        , div [ class "book-tracks-col" ] [ text <| toString <| Array.length book.fileProgresses ]
+        , div [ class "book-title-col", setBookOnClick book ] [ text <| withDefault book.guid book.title ]
+        , div [ class "book-id-col", setBookOnClick book ] [ text <| book.guid ]
+        , div [ class "book-tracks-col", setBookOnClick book ] [ text <| toString <| Array.length book.fileProgresses ]
+        , case selected of
+            Just s ->
+                if s == book then
+                    selectedBookView book
+
+                else
+                    text ""
+
+            _ ->
+                text ""
         ]
 
 
-bookTable : Array ServerBook -> Html Msg
-bookTable books =
+bookTable : Maybe ServerBook -> Array ServerBook -> Html Msg
+bookTable selected books =
     div [ class "book-collection" ]
         [ div [ class "book-grid-header" ]
             [ div [ id "book-play-col-header" ] []
@@ -37,7 +63,7 @@ bookTable books =
             , div [ id "book-id-col-header" ] [ text "Id" ]
             , div [ id "book-tracks-col-header" ] [ text "Tracks" ]
             ]
-        , div [ class "book-grid" ] (Array.toList <| Array.indexedMap bookRow books)
+        , div [ class "book-grid" ] (Array.toList <| Array.indexedMap (bookRow selected) books)
         ]
 
 
@@ -45,5 +71,5 @@ libraryPageView : LibraryModel -> Html Msg
 libraryPageView libraryModel =
     div [ id "library-books" ]
         [ libraryModel.books
-            |> bookTable
+            |> bookTable libraryModel.selectedBook
         ]

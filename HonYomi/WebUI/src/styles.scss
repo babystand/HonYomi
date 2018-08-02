@@ -160,7 +160,9 @@ $book-grid-columns: 40px auto auto 70px;
         width: 100%;
         font-size: 12px;
         display: grid;
-
+        max-height: 80%;
+        overflow-y: auto;
+        width: 100%;
         .book-row{
           display: grid;
           grid-template-columns: $book-grid-columns;
@@ -181,41 +183,6 @@ $book-grid-columns: 40px auto auto 70px;
           grid-column: 4;
         }
 
-        thead {
-            background: #111111;
-            tr {
-                height: 30px;
-                th {
-                    text-align: center;
-                    border-right: solid 1px #403F40;
-                    &:last-of-type {
-                        border-right: none;
-                    }
-                }
-            }
-        }
-        tbody {
-            tr {
-                width: 100%;
-                border-bottom: solid 1px #403F40;
-                &:last-of-type {
-                    border-bottom: none;
-                }
-                td {
-                    text-align: center;
-                    height: 30px;
-                    border-right: solid 1px $black;
-                    &:last-of-type {
-                        border-right: none;
-                    }
-                }
-            }
-        }
-        .scrollable-table {
-            max-height: 200px;
-            overflow-y: auto;
-            width: 100%;
-        }
     }
 }
 

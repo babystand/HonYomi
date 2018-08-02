@@ -78,6 +78,16 @@ initMainModel =
     { token = "", page = LoginPage initLoginModel, playback = Nothing }
 
 
+setSelectedBook : LibraryModel -> ServerBook.ServerBook -> LibraryModel
+setSelectedBook model book =
+    { model | selectedBook = Just book }
+
+
+unsetSelectedBook : LibraryModel -> LibraryModel
+unsetSelectedBook model =
+    { model | selectedBook = Nothing }
+
+
 getPlayback : Model -> PlaybackModel
 getPlayback model =
     model.playback |> withDefault { guid = "", title = "", bookTitle = "", trackIndex = 0, url = "", mediaType = "", currentTime = 0.0, duration = 0.0, ended = False }

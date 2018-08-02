@@ -75,8 +75,14 @@ updateLibraryPage model libmsg lpage =
             in
             ( { model | page = LibraryPage newPage }, Cmd.none )
 
-        Messages.BooksError _ ->
+        BooksError _ ->
             ( model, Cmd.none )
+
+        SetSelectedBook book ->
+            ( { model | page = LibraryPage <| setSelectedBook lpage book }, Cmd.none )
+
+        UnsetBook ->
+            ( { model | page = LibraryPage <| unsetSelectedBook lpage }, Cmd.none )
 
 
 updateConfigPage : Model -> ConfigMsg -> ConfigModel -> ( Model, Cmd Msg )
@@ -184,8 +190,12 @@ updatePlayback model msg =
             in
             ( { model | playback = newPlayback }, Cmd.none )
 
-        Messages.UpdatePostion ->
-            ( model, getAudioProgress () )
+        Ended ->
+            let
+                newPlayback =
+                    Just <| { pmod | ended = True }
+            in
+            ( { model | playback = newPlayback }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -255,7 +265,9 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ audioProgress (Playback << ProgressChanged)
-        , Time.every Time.second <| \_ -> Playback UpdatePostion
+        , onEnded (\_ -> Playback Ended)
+
+        -- , Time.every Time.second <| \_ -> Playback UpdatePostion
         ]
 
 

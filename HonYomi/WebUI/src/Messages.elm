@@ -20,8 +20,8 @@ type AuthMsg
 type PlaybackMsg
     = SetTrack (Maybe ServerFile)
     | ReloadTrack
-    | UpdatePostion
     | ProgressChanged Float
+    | Ended
 
 
 
@@ -32,6 +32,8 @@ type LibraryMsg
     = BooksRequest
     | BooksSuccess Book.Library
     | BooksError String
+    | SetSelectedBook Book.ServerBook
+    | UnsetBook
 
 
 type ConfigMsg
