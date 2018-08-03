@@ -9,7 +9,7 @@ import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import Ports exposing (..)
-import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, refreshRequest, setProgressRequest)
+import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, progressookRequest, refreshRequest, setProgressRequest)
 
 
 type alias Page =
@@ -208,7 +208,7 @@ updatePlayback model msg =
                 newPlayback =
                     Just <| { pmod | ended = True }
             in
-            ( { model | playback = newPlayback }, Cmd.none )
+            updatePlayback { model | playback = newPlayback } ProgressBook
 
         Play ->
             ( model, playAudio () )
@@ -243,6 +243,15 @@ updatePlayback model msg =
             ( model, Cmd.none )
 
         SaveTrackSuccess ->
+            ( model, Cmd.none )
+
+        ProgressBook ->
+            ( model, progressookRequest model.token pmod )
+
+        ProgressBookSuccess file ->
+            updatePlayback model (SetTrack <| Just file)
+
+        ProgressBookError ->
             ( model, Cmd.none )
 
 

@@ -32,10 +32,9 @@ type PlaybackMsg
     | SaveTrackPosition
     | SaveTrackError
     | SaveTrackSuccess
-
-
-
---todo: figure out how the loading process will work, and how to wire up ports to do so
+    | ProgressBook
+    | ProgressBookSuccess ServerFile
+    | ProgressBookError
 
 
 type LibraryMsg

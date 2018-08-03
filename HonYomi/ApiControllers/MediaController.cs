@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataLib;
+using Hangfire.MemoryStorage.Database;
 using HonYomi.Exposed;
 using Microsoft.AspNetCore.Antiforgery.Internal;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -20,6 +22,29 @@ namespace HonYomi.ApiControllers
     public class MediaController : Controller
     {
 
+        [HttpGet, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme),
+         Route("/api/books/progress/{bookId}")]
+        public IActionResult ProgressBook(Guid bookId)
+        {
+            try
+            {
+                DataAccess.AdvanceBookProgress(User.Identity.Name, bookId);
+                using (var db = new HonyomiContext())
+                {
+                    var book = db.BookProgresses.Include(x => x.Book).Include(x => x.File).SingleOrDefault(x => x.UserId == User.Identity.Name && x.BookId == bookId);
+                    if (book == null) return BadRequest();
+                    var fProg = db.FileProgresses.SingleOrDefault(
+                        x => x.UserId == User.Identity.Name && x.FileId == book.FileId);
+                    if (fProg == null) return BadRequest();
+                    var resp = new FileWithProgress(book.FileId, book.File.Title, book.BookId, book.Book.Title, book.File.TrackIndex, fProg.Progress, book.File.MimeType   );
+                    return Json(resp);
+                }
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
         [HttpGet]
         [Route("/api/tracks/stream/{location}")]
         //accepts byte range headers

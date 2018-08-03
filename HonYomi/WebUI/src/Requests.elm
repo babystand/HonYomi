@@ -160,3 +160,20 @@ setProgressRequest tok model =
     Http.send mapProgressRequest <|
         Jwt.get tok ("/api/tracks/progress/set/" ++ model.guid ++ "/" ++ toString model.currentTime) <|
             Json.Decode.bool
+
+
+mapProgressBookRequest : Result Http.Error ServerFile -> M.Msg
+mapProgressBookRequest result =
+    case result of
+        Ok file ->
+            M.Playback <| M.ProgressBookSuccess file
+
+        Err _ ->
+            M.Playback <| M.ProgressBookError
+
+
+progressookRequest : Models.Token -> PlaybackModel -> Cmd M.Msg
+progressookRequest tok model =
+    Http.send mapProgressBookRequest <|
+        Jwt.get tok ("/api/books/progress/" ++ model.bookId) <|
+            decodeServerFile
