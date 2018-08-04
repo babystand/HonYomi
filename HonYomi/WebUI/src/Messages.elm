@@ -20,6 +20,7 @@ type AuthMsg
 type PlaybackMsg
     = SetTrack (Maybe ServerFile)
     | ReloadTrack
+    | AudioLoaded
     | ProgressChanged Float
     | DurationChanged Float
     | Ended
@@ -32,7 +33,7 @@ type PlaybackMsg
     | SaveTrackPosition
     | SaveTrackError
     | SaveTrackSuccess
-    | ProgressBook
+    | SetBookProgress String --Takes the ID of the track to set as current for the book
     | ProgressBookSuccess ServerFile
     | ProgressBookError
 

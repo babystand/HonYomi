@@ -172,8 +172,8 @@ mapProgressBookRequest result =
             M.Playback <| M.ProgressBookError
 
 
-progressookRequest : Models.Token -> PlaybackModel -> Cmd M.Msg
-progressookRequest tok model =
+progressBookRequest : Models.Token -> String -> Cmd M.Msg
+progressBookRequest tok trackid =
     Http.send mapProgressBookRequest <|
-        Jwt.get tok ("/api/books/progress/" ++ model.bookId) <|
+        Jwt.get tok ("/api/books/settrack/" ++ trackid) <|
             decodeServerFile

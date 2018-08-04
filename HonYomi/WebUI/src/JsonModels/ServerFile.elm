@@ -12,12 +12,13 @@ type alias ServerFile =
     , trackIndex : Int
     , progressSeconds : Float
     , mediaType : String
+    , nextFile : String
     }
 
 
 defaultServerFile : ServerFile
 defaultServerFile =
-    { guid = "", title = Just "", bookGuid = "", bookTitle = Just "", trackIndex = 0, progressSeconds = 0, mediaType = "" }
+    { guid = "", title = Just "", bookGuid = "", bookTitle = Just "", trackIndex = 0, progressSeconds = 0, mediaType = "", nextFile = "" }
 
 
 decodeServerFile : Json.Decode.Decoder ServerFile
@@ -30,3 +31,4 @@ decodeServerFile =
         |> Json.Decode.Pipeline.required "trackIndex" Json.Decode.int
         |> Json.Decode.Pipeline.required "progressSeconds" Json.Decode.float
         |> Json.Decode.Pipeline.required "mediaType" Json.Decode.string
+        |> Json.Decode.Pipeline.required "nextFile" Json.Decode.string

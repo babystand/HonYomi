@@ -21,33 +21,22 @@ namespace HonYomi.ApiControllers
     [ApiController]
     public class MediaController : Controller
     {
-
         [HttpGet, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme),
-         Route("/api/books/progress/{bookId}")]
-        public IActionResult ProgressBook(Guid bookId)
+         Route("/api/books/settrack/{trackId}")]
+        public IActionResult SetTrack(Guid trackId)
         {
             try
             {
-                DataAccess.AdvanceBookProgress(User.Identity.Name, bookId);
-                using (var db = new HonyomiContext())
-                {
-                    var book = db.BookProgresses.Include(x => x.Book).Include(x => x.File).SingleOrDefault(x => x.UserId == User.Identity.Name && x.BookId == bookId);
-                    if (book == null) return BadRequest();
-                    var fProg = db.FileProgresses.SingleOrDefault(
-                        x => x.UserId == User.Identity.Name && x.FileId == book.FileId);
-                    if (fProg == null) {
-                        db.FileProgresses.Add(new FileProgress(){UserId = User.Identity.Name, FileId=book.Book.IndexedBookId, Progress = 0});
-                        db.SaveChanges();
-                    }
-                    var resp = new FileWithProgress(book.FileId, book.File.Title, book.BookId, book.Book.Title, book.File.TrackIndex, fProg.Progress, book.File.MimeType   );
-                    return Json(resp);
-                }
+                DataAccess.SetCurrentTrack(User.Identity.Name, trackId);
+                return Json(DataAccess.GetUserFileProgress(User.Identity.Name, trackId));
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e);
             }
         }
+
+      
         [HttpGet]
         [Route("/api/tracks/stream/{location}")]
         //accepts byte range headers
@@ -93,28 +82,13 @@ namespace HonYomi.ApiControllers
         {
             try
             {
-                using (var db = new HonyomiContext())
-                {
-                    FileProgress prog =
-                        db.FileProgresses.SingleOrDefault(x => x.UserId == User.Identity.Name && x.FileId == trackId);
-                    if (prog == null)
-                    {
-                        db.FileProgresses.Add(
-                            new FileProgress {FileId = trackId, UserId = User.Identity.Name, Progress = seconds});
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-                        prog.Progress = seconds;
-                        db.SaveChanges();
-                    }
-
+               DataAccess.SetTrackProgress(User.Identity.Name, trackId, seconds);
                     return Json(true);
-                }
+                
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e);
             }
         }
 
@@ -125,10 +99,8 @@ namespace HonYomi.ApiControllers
             const string path = "../HonYomi.Tests/long.mp3";
             return File(System.IO.File.OpenRead(path), "audio/mpeg", true);
         }
-/*
- * stored as 
- */
-        private (Guid id, string jwt) SplitTrackAddress(string location)
+
+        private static (Guid id, string jwt) SplitTrackAddress(string location)
         {
             try
             {

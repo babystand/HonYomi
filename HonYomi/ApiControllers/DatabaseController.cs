@@ -66,9 +66,9 @@ namespace HonYomi.ApiControllers
                     return Json(result);
                
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return BadRequest();
+                return BadRequest(e);
             }
         }
                 [HttpGet]

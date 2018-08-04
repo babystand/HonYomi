@@ -9,7 +9,7 @@ import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import Ports exposing (..)
-import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, progressookRequest, refreshRequest, setProgressRequest)
+import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, progressBookRequest, refreshRequest, setProgressRequest)
 
 
 type alias Page =
@@ -182,6 +182,18 @@ updatePlayback model msg =
         ReloadTrack ->
             ( model, loadAudioSource () )
 
+        AudioLoaded ->
+            let
+                newTime =
+                    case model.playback of
+                        Just p ->
+                            p.savedTime
+
+                        Nothing ->
+                            0
+            in
+            ( model, setCurrentTime newTime )
+
         ProgressChanged progress ->
             let
                 newPlayback =
@@ -208,7 +220,7 @@ updatePlayback model msg =
                 newPlayback =
                     Just <| { pmod | ended = True }
             in
-            updatePlayback { model | playback = newPlayback } ProgressBook
+            updatePlayback { model | playback = newPlayback } (SetBookProgress pmod.next)
 
         Play ->
             ( model, playAudio () )
@@ -245,8 +257,8 @@ updatePlayback model msg =
         SaveTrackSuccess ->
             ( model, Cmd.none )
 
-        ProgressBook ->
-            ( model, progressookRequest model.token pmod )
+        SetBookProgress trackid ->
+            ( model, progressBookRequest model.token trackid )
 
         ProgressBookSuccess file ->
             updatePlayback model (SetTrack <| Just file)
@@ -322,6 +334,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ audioProgress (Playback << ProgressChanged)
+        , audioLoaded (\_ -> Playback AudioLoaded)
         , durationChange (Playback << DurationChanged)
         , onEnded (\_ -> Playback Ended)
         , onPlayed (\_ -> Playback Played)

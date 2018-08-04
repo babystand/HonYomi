@@ -4,6 +4,9 @@ port module Ports exposing (..)
 port loadAudioSource : () -> Cmd msg
 
 
+port audioLoaded : (() -> msg) -> Sub msg
+
+
 port audioProgress : (Float -> msg) -> Sub msg
 
 

@@ -12,6 +12,8 @@ namespace HonYomi.Exposed
         public int    TrackIndex      { get; set; }
         public double ProgressSeconds { get; set; }
         public string MediaType       { get; set; }
+        public Guid NextFile { get; set; }
+
 
         public FileWithProgress()
         {
