@@ -35,7 +35,10 @@ namespace HonYomi.ApiControllers
                     if (book == null) return BadRequest();
                     var fProg = db.FileProgresses.SingleOrDefault(
                         x => x.UserId == User.Identity.Name && x.FileId == book.FileId);
-                    if (fProg == null) return BadRequest();
+                    if (fProg == null) {
+                        db.FileProgresses.Add(new FileProgress(){UserId = User.Identity.Name, FileId=book.Book.IndexedBookId, Progress = 0});
+                        db.SaveChanges();
+                    }
                     var resp = new FileWithProgress(book.FileId, book.File.Title, book.BookId, book.Book.Title, book.File.TrackIndex, fProg.Progress, book.File.MimeType   );
                     return Json(resp);
                 }

@@ -161,7 +161,7 @@ namespace DataLib
                     db.BookProgresses.Add(new BookProgress()
                                        {
                                            Book   = book,
-                                           File   = book.Files.OrderBy(x => x.TrackIndex).First(),
+                                           File   = book.Files.OrderBy(x => x.TrackIndex).Skip(1).First(), //we'll never progress from null to 0, just 0 to 1..
                                            UserId = userId
                                        });
                     db.SaveChanges();
