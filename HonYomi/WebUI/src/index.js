@@ -5,12 +5,12 @@ require("./styles.scss");
 var Elm = require('./Main');
 var app = Elm.Main.fullscreen();
 
-
-function loadAudioSource (){
-  let audio = document.getElementById('audio');
+const audio = document.getElementById('audio');
+const source = document.getElementById('audio-source');
+function setAudioSource (url){
   console.log("loading source");
-  if(audio !== null && audio !== undefined){
-    audio.load();
+  console.log("url = " + url);
+    source.src = url;
     audio.load();
     audio.onended = () => app.ports.onEnded.send(null);
     audio.ontimeupdate = () => app.ports.audioProgress.send(audio.currentTime);
@@ -18,7 +18,7 @@ function loadAudioSource (){
     audio.onplay = () => app.ports.onPlayed.send(null);
     audio.onpause = () => app.ports.onPaused.send(null);
     audio.play();
-  }
+
   let progress = document.getElementById('progress-bar');
   if(progress !== null && progress !== undefined){
     progress.onclick = (e) => {
@@ -33,10 +33,13 @@ function loadAudioSource (){
       app.ports.onScrub.send(cPos);
     };
   }
+  else{
+    console.warn("didn't find progress");
+  }
 }
 
 
-app.ports.loadAudioSource.subscribe(() => loadAudioSource());
+app.ports.setAudioSource.subscribe(url => setAudioSource(url));
 app.ports.playAudio.subscribe(() => ac.play());
 app.ports.pauseAudio.subscribe(() => ac.pause());
 app.ports.setCurrentTime.subscribe(f => ac.setCurrentTime(f));

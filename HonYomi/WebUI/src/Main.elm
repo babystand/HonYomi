@@ -9,7 +9,7 @@ import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import Ports exposing (..)
-import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, progressBookRequest, refreshRequest, setProgressRequest)
+import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, nextTrackRequest, progressBookRequest, refreshRequest, setProgressRequest)
 
 
 type alias Page =
@@ -171,16 +171,28 @@ updatePlayback model msg =
             getPlayback model
     in
     case msg of
-        SetTrack mfile ->
+        SetTrackReload mfile ->
             case mfile of
                 Just file ->
-                    updatePlayback { model | playback = Just <| setPlayback file model.token pmod } ReloadTrack
+                    let
+                        newPlayback =
+                            setPlayback file model.token pmod
+                    in
+                    updatePlayback { model | playback = Just <| newPlayback } (LoadTrack (Debug.log "urlis" newPlayback.url))
 
                 Nothing ->
                     ( model, Cmd.none )
 
-        ReloadTrack ->
-            ( model, loadAudioSource () )
+        SetTrackNoReload mfile ->
+            case mfile of
+                Just file ->
+                    update (Library BooksRequest) { model | playback = Just <| setPlayback file model.token pmod }
+
+                Nothing ->
+                    ( model, Cmd.none )
+
+        LoadTrack url ->
+            ( model, setAudioSource (Debug.log "urlisis" url) )
 
         AudioLoaded ->
             let
@@ -217,10 +229,13 @@ updatePlayback model msg =
 
         Ended ->
             let
+                ( m, c ) =
+                    updatePlayback model Pause
+
                 newPlayback =
                     Just <| { pmod | ended = True }
             in
-            updatePlayback { model | playback = newPlayback } (SetBookProgress pmod.next)
+            updatePlayback { m | playback = newPlayback } NextTrackRequest
 
         Play ->
             ( model, playAudio () )
@@ -261,9 +276,18 @@ updatePlayback model msg =
             ( model, progressBookRequest model.token trackid )
 
         ProgressBookSuccess file ->
-            updatePlayback model (SetTrack <| Just file)
+            updatePlayback model (SetTrackNoReload <| Just file)
 
         ProgressBookError ->
+            ( model, Cmd.none )
+
+        NextTrackRequest ->
+            ( model, nextTrackRequest model.token pmod.next )
+
+        NextTrackSuccess file ->
+            updatePlayback model (SetTrackReload (Just file))
+
+        NextTrackError ->
             ( model, Cmd.none )
 
 

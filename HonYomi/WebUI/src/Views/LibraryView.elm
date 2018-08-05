@@ -98,7 +98,7 @@ bookRow selected index book =
             else
                 ""
         ]
-        [ div [ class "book-play-col", onClick <| Playback (SetTrack <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
+        [ div [ class "book-play-col", onClick <| Playback (SetTrackReload <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
         , div [ class "book-title-col", bookOnClick selected book ] [ text <| withDefault book.guid book.title ]
         , div [ class "book-id-col", bookOnClick selected book ] [ text <| book.guid ]
         , div [ class "book-tracks-col", bookOnClick selected book ] [ text <| toString <| Array.length book.fileProgresses ]

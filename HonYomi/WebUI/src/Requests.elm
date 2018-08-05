@@ -177,3 +177,20 @@ progressBookRequest tok trackid =
     Http.send mapProgressBookRequest <|
         Jwt.get tok ("/api/books/settrack/" ++ trackid) <|
             decodeServerFile
+
+
+mapNextTrackRequest : Result Http.Error ServerFile -> M.Msg
+mapNextTrackRequest result =
+    case result of
+        Ok file ->
+            M.Playback <| M.NextTrackSuccess file
+
+        Err _ ->
+            M.Playback <| M.NextTrackError
+
+
+nextTrackRequest : Models.Token -> String -> Cmd M.Msg
+nextTrackRequest tok trackid =
+    Http.send mapNextTrackRequest <|
+        Jwt.get tok ("/api/books/settrack/" ++ trackid) <|
+            decodeServerFile

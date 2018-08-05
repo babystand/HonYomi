@@ -18,8 +18,9 @@ type AuthMsg
 
 
 type PlaybackMsg
-    = SetTrack (Maybe ServerFile)
-    | ReloadTrack
+    = SetTrackReload (Maybe ServerFile)
+    | SetTrackNoReload (Maybe ServerFile)
+    | LoadTrack String --takes url
     | AudioLoaded
     | ProgressChanged Float
     | DurationChanged Float
@@ -36,6 +37,9 @@ type PlaybackMsg
     | SetBookProgress String --Takes the ID of the track to set as current for the book
     | ProgressBookSuccess ServerFile
     | ProgressBookError
+    | NextTrackRequest
+    | NextTrackSuccess ServerFile
+    | NextTrackError
 
 
 type LibraryMsg

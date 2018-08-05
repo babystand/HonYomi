@@ -46,9 +46,5 @@ playbackView model =
                     [ div [ id "progress-value", style [ ( "width", (toString <| 100 * model.currentTime / model.duration) ++ "%" ) ] ] []
                     ]
                 ]
-            , audio [ id "audio" ]
-                [ source [ id "audio-source", src model.url ] []
-                , text "This browser cannot play audio"
-                ]
             ]
         ]

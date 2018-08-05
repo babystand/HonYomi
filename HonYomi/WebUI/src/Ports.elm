@@ -1,7 +1,7 @@
 port module Ports exposing (..)
 
 
-port loadAudioSource : () -> Cmd msg
+port setAudioSource : String -> Cmd msg
 
 
 port audioLoaded : (() -> msg) -> Sub msg
