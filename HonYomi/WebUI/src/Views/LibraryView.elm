@@ -125,6 +125,10 @@ bookTable selected books =
 
 libraryPageView : LibraryModel -> Html Msg
 libraryPageView libraryModel =
+    -- let
+    --     a =
+    --         Debug.log "selectedBook" libraryModel.selectedBook
+    -- in
     div [ id "library-books" ]
         [ libraryModel.books
             |> bookTable libraryModel.selectedBook

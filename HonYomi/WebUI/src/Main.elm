@@ -9,7 +9,7 @@ import Maybe exposing (withDefault)
 import Messages exposing (..)
 import Models exposing (..)
 import Ports exposing (..)
-import Requests exposing (authRequest, configGetRequest, configPostRequest, libraryRequest, mapAuthRequest, nextTrackRequest, progressBookRequest, refreshRequest, setProgressRequest)
+import Requests exposing (..)
 
 
 type alias Page =
@@ -71,8 +71,16 @@ updateLibraryPage model libmsg lpage =
             let
                 newPage =
                     { lpage | books = bs }
+
+                newModel =
+                    { model | page = LibraryPage newPage }
             in
-            ( { model | page = LibraryPage newPage }, Cmd.none )
+            case lpage.selectedBook of
+                Just book ->
+                    update (Library <| SetSelectedBook book) newModel
+
+                Nothing ->
+                    ( newModel, Cmd.none )
 
         BooksError _ ->
             ( model, Cmd.none )
@@ -270,7 +278,7 @@ updatePlayback model msg =
             ( model, Cmd.none )
 
         SaveTrackSuccess ->
-            ( model, Cmd.none )
+            update (Library BooksRequest) model
 
         SetBookProgress trackid ->
             ( model, progressBookRequest model.token trackid )
