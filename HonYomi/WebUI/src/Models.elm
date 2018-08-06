@@ -46,6 +46,9 @@ type alias LibraryModel =
 
 type alias ConfigModel =
     { config : ServerConfig
+    , username : String
+    , password : String
+    , newPassword : String
     }
 
 
@@ -74,7 +77,7 @@ initLibraryModel =
 
 initConfigModel : ConfigModel
 initConfigModel =
-    { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty } }
+    { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty }, username = "", password = "", newPassword = "" }
 
 
 initMainModel : Model
@@ -115,7 +118,7 @@ removeWatchDirectory index model =
         newconf =
             { conf | watchDirectories = newDirs }
     in
-    { config = newconf }
+    { model | config = newconf }
 
 
 addWatchDirectory : ConfigModel -> ConfigModel
@@ -130,7 +133,7 @@ addWatchDirectory model =
         newconf =
             { conf | watchDirectories = newDirs }
     in
-    { config = newconf }
+    { model | config = newconf }
 
 
 modifyWatchDirectory : Int -> String -> ConfigModel -> ConfigModel

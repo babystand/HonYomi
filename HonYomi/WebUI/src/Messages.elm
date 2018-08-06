@@ -61,6 +61,15 @@ type ConfigMsg
     | AddDir
     | RemoveDir Int
     | ModifyDir Int String
+    | SetConfigUsernameField String
+    | SetConfigPasswordField String
+    | SetConfigNewPasswordField String
+    | ChangeUsernameRequest
+    | ChangeUsernameSuccess
+    | ChangeUsernameError
+    | ChangePasswordRequest
+    | ChangePasswordSuccess
+    | ChangePasswordError
 
 
 type RouteMsg
