@@ -64,7 +64,7 @@ type alias Model =
 
 initLoginModel : LoginModel
 initLoginModel =
-    { username = "", password = "" }
+    { username = "", password = "", newPassword = "" }
 
 
 initLibraryModel : LibraryModel

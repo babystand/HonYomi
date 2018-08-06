@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.DataAnnotations.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -37,7 +38,8 @@ namespace HonYomi.ApiControllers
                 var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == model.Username);
                 return GenerateJwtToken(model.Username, user);
             }
-            throw new ApplicationException("Bad login");
+
+            return BadRequest();
         }
         
         //todo: disable for production
@@ -56,9 +58,44 @@ namespace HonYomi.ApiControllers
             {
                 return Ok();
             }
-            
-            throw new ApplicationException("UNKNOWN_ERROR");
+
+            return BadRequest();
         }
+        [HttpGet]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Route("/api/auth/changeusername/{username}")]
+        public async Task<IActionResult> ChangeUsername([FromBody] string username)
+        {
+            var user = new IdentityUser
+            {
+                Id = User.Identity.Name
+            }; 
+            var result = await userManager.SetUserNameAsync(user, username);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+        [HttpPost]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Route("/api/auth/changepassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] UserCreds model)
+        {
+            var user = new IdentityUser
+            {
+                UserName = model.Username
+            }; 
+            var result = await userManager.ChangePasswordAsync(user, model.Password, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+
+            return BadRequest();
+        }
+        
         [HttpGet, Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme), Route("/api/auth/refresh")]
         public async Task<object> Refresh() {
             var user = await userManager.Users.SingleOrDefaultAsync(r => r.UserName == User.Identity.Name);
@@ -101,8 +138,10 @@ namespace HonYomi.ApiControllers
 
             [Required]
             public string Password { get; set; }
+            public string NewPassword { get; set; }
 
         }
-        
+
+    
     }
 }
