@@ -40,7 +40,7 @@ type alias PlaybackModel =
 
 type alias LibraryModel =
     { books : ServerBook.Library
-    , selectedBook : Maybe ServerBook.ServerBook
+    , selectedBookId : String
     }
 
 
@@ -69,7 +69,7 @@ initLoginModel =
 
 initLibraryModel : LibraryModel
 initLibraryModel =
-    { books = Array.empty, selectedBook = Nothing }
+    { books = Array.empty, selectedBookId = "" }
 
 
 initConfigModel : ConfigModel
@@ -84,12 +84,12 @@ initMainModel =
 
 setSelectedBook : LibraryModel -> ServerBook.ServerBook -> LibraryModel
 setSelectedBook model book =
-    { model | selectedBook = Just book }
+    { model | selectedBookId = book.guid }
 
 
 unsetSelectedBook : LibraryModel -> LibraryModel
 unsetSelectedBook model =
-    { model | selectedBook = Nothing }
+    { model | selectedBookId = "" }
 
 
 getPlayback : Model -> PlaybackModel

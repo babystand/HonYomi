@@ -22,18 +22,13 @@ unsetBookOnClick =
     onClick <| Library UnsetBook
 
 
-bookOnClick : Maybe ServerBook -> ServerBook -> Html.Attribute Msg
-bookOnClick mbook book =
-    case mbook of
-        Just jb ->
-            if jb == book then
-                unsetBookOnClick
+bookOnClick : String -> ServerBook -> Html.Attribute Msg
+bookOnClick selectid book =
+    if selectid == book.guid then
+        unsetBookOnClick
 
-            else
-                setBookOnClick book
-
-        Nothing ->
-            setBookOnClick book
+    else
+        setBookOnClick book
 
 
 fileRowView : Int -> ServerFile -> Html Msg
@@ -71,8 +66,8 @@ selectedBookView book =
                )
 
 
-bookRow : Maybe ServerBook -> Int -> ServerBook -> Html Msg
-bookRow selected index book =
+bookRow : String -> Int -> ServerBook -> Html Msg
+bookRow selectid index book =
     let
         rowClass =
             if index % 2 == 0 then
@@ -80,38 +75,37 @@ bookRow selected index book =
 
             else
                 class "book-row book-row-alt"
-
-        isSelected =
-            case selected of
-                Just sel ->
-                    sel == book
-
-                _ ->
-                    False
     in
     div
         [ rowClass
         , class <|
-            if isSelected then
+            if book.guid == selectid then
                 "selected-book-row"
 
             else
                 ""
         ]
         [ div [ class "book-play-col", onClick <| Playback (SetTrackReload <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
-        , div [ class "book-title-col", bookOnClick selected book ] [ text <| withDefault book.guid book.title ]
-        , div [ class "book-id-col", bookOnClick selected book ] [ text <| book.guid ]
-        , div [ class "book-tracks-col", bookOnClick selected book ] [ text <| toString <| Array.length book.fileProgresses ]
-        , if isSelected then
-            selectedBookView book
-
-          else
-            text ""
+        , div [ class "book-title-col", bookOnClick selectid book ] [ text <| withDefault book.guid book.title ]
+        , div [ class "book-id-col", bookOnClick selectid book ] [ text <| book.guid ]
+        , div [ class "book-tracks-col", bookOnClick selectid book ] [ text <| toString <| Array.length book.fileProgresses ]
+        , div [ class "file-rows" ] <|
+            [ div [ class "file-row file-rows-header" ]
+                [ div [ class "file-gap-col" ] []
+                , div [ class "file-play-col" ] []
+                , div [ class "file-title-col" ] [ text "Title" ]
+                , div [ class "file-id-col" ] [ text "Id" ]
+                , div [ class "file-progress-col" ] [ text "Progress" ]
+                ]
+            ]
+                ++ (Array.toList <|
+                        Array.indexedMap fileRowView book.fileProgresses
+                   )
         ]
 
 
-bookTable : Maybe ServerBook -> Array ServerBook -> Html Msg
-bookTable selected books =
+bookTable : String -> Array ServerBook -> Html Msg
+bookTable selectid books =
     div [ class "book-collection" ]
         [ div [ class "book-grid-header" ]
             [ div [ id "book-play-col-header" ] []
@@ -119,7 +113,7 @@ bookTable selected books =
             , div [ id "book-id-col-header" ] [ text "Id" ]
             , div [ id "book-tracks-col-header" ] [ text "Tracks" ]
             ]
-        , div [ class "book-grid" ] (Array.toList <| Array.indexedMap (bookRow selected) books)
+        , div [ class "book-grid" ] (Array.toList <| Array.indexedMap (bookRow selectid) books)
         ]
 
 
@@ -131,5 +125,5 @@ libraryPageView libraryModel =
     -- in
     div [ id "library-books" ]
         [ libraryModel.books
-            |> bookTable libraryModel.selectedBook
+            |> bookTable libraryModel.selectedBookId
         ]

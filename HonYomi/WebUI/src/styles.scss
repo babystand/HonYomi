@@ -162,10 +162,55 @@ $book-grid-columns: 40px auto auto 70px;
         max-height: 80%;
         overflow-y: auto;
         width: 100%;
+        .file-rows {
+            grid-column-start: 1;
+            grid-column-end: 5;
+    color: $light;
+            .file-row {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 20px 20px auto auto auto;
+                grid-template-rows: auto;
+                text-align: center;
+                background: #303030;
+            }
+            .file-row-alt{
+              background: #353535;
+            }
+            .file-rows-header {
+                background: #606060;
+                color: #111111;
+                div {
+                    text-align: center;
+                    border-right: solid 1px #777777;
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+            }
+            .file-gap-col {
+                grid-column: 1;
+            }
+            .file-play-col {
+                grid-column: 2;
+            }
+            .file-title-col {
+                grid-column: 3;
+            }
+            .file-id-col {
+                grid-column: 4;
+            }
+            .file-progress-col {
+                grid-column: 5;
+            }
+        }
         .book-row {
             display: grid;
             grid-template-columns: $book-grid-columns;
             background: #191919;
+            .file-rows{
+              display:none;
+            }
         }
         .book-row-alt {
             background: #242424;
@@ -173,6 +218,9 @@ $book-grid-columns: 40px auto auto 70px;
         >.selected-book-row {
             background: #666666;
             color: #111111;
+            .file-rows{
+              display:grid;
+            }
         }
         .book-id-col,
         .book-play-col,
@@ -193,48 +241,7 @@ $book-grid-columns: 40px auto auto 70px;
             grid-column: 4;
         }
     }
-    .file-rows {
-        grid-column-start: 1;
-        grid-column-end: 5;
-color: $light;
-        .file-row {
-            width: 100%;
-            display: grid;
-            grid-template-columns: 20px 20px auto auto auto;
-            grid-template-rows: auto;
-            text-align: center;
-            background: #303030;
-        }
-        .file-row-alt{
-          background: #353535;
-        }
-        .file-rows-header {
-            background: #606060;
-            color: #111111;
-            div {
-                text-align: center;
-                border-right: solid 1px #777777;
-                &:last-of-type {
-                    border-right: none;
-                }
-            }
-        }
-        .file-gap-col {
-            grid-column: 1;
-        }
-        .file-play-col {
-            grid-column: 2;
-        }
-        .file-title-col {
-            grid-column: 3;
-        }
-        .file-id-col {
-            grid-column: 4;
-        }
-        .file-progress-col {
-            grid-column: 5;
-        }
-    }
+
 }
 
 #config-section {

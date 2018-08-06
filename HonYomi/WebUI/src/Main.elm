@@ -61,26 +61,17 @@ updateLibraryPage : Model -> LibraryMsg -> LibraryModel -> ( Model, Cmd Msg )
 updateLibraryPage model libmsg lpage =
     case libmsg of
         BooksRequest ->
-            let
-                booksResponse =
-                    libraryRequest model.token
-            in
-            ( model, booksResponse )
+            ( model, libraryRequest model.token )
 
-        Messages.BooksSuccess bs ->
+        BooksSuccess bs ->
             let
                 newPage =
-                    { lpage | books = bs }
+                    { lpage | books = bs, selectedBookId = lpage.selectedBookId }
 
                 newModel =
                     { model | page = LibraryPage newPage }
             in
-            case lpage.selectedBook of
-                Just book ->
-                    update (Library <| SetSelectedBook book) newModel
-
-                Nothing ->
-                    ( newModel, Cmd.none )
+            ( newModel, Cmd.none )
 
         BooksError _ ->
             ( model, Cmd.none )
@@ -237,13 +228,10 @@ updatePlayback model msg =
 
         Ended ->
             let
-                ( m, c ) =
-                    updatePlayback model Pause
-
                 newPlayback =
                     Just <| { pmod | ended = True }
             in
-            updatePlayback { m | playback = newPlayback } NextTrackRequest
+            updatePlayback { model | playback = newPlayback } NextTrackRequest
 
         Play ->
             ( model, playAudio () )
@@ -278,7 +266,16 @@ updatePlayback model msg =
             ( model, Cmd.none )
 
         SaveTrackSuccess ->
-            update (Library BooksRequest) model
+            case model.playback of
+                Just playback ->
+                    let
+                        newPlayback =
+                            { playback | savedTime = playback.currentTime }
+                    in
+                    update (Library BooksRequest) { model | playback = Just newPlayback }
+
+                Nothing ->
+                    update (Library BooksRequest) model
 
         SetBookProgress trackid ->
             ( model, progressBookRequest model.token trackid )

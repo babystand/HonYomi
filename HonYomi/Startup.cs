@@ -28,10 +28,7 @@ namespace HonYomi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //delete db for debugging
-
-            if (File.Exists(RuntimeConstants.DatabaseLocation))
-                File.Delete(RuntimeConstants.DatabaseLocation);
+            
 
             /***EF Core***/
             services.AddDbContext<HonyomiContext>();
@@ -88,6 +85,10 @@ namespace HonYomi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                //delete db for debugging
+
+                if (File.Exists(RuntimeConstants.DatabaseLocation))
+                    File.Delete(RuntimeConstants.DatabaseLocation);
             }
 
             /***MVC***/
