@@ -28,7 +28,7 @@ configPageView configModel =
                 ]
             ]
         , div [ class "config-dirs-section" ]
-            [ div [] [ span [ class "config-add", onClick <| Config AddDir ] [ text "+" ] ]
+            [ div [] [ div [ class "config-add", onClick <| Config AddDir ] [ text "+" ] ]
             , div [ id "config-dirs" ] (Array.toList <| Array.indexedMap watchDirView configModel.config.watchDirectories)
             ]
         , div [ class "config-buttons" ]

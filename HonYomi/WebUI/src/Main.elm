@@ -263,7 +263,7 @@ updatePlayback model msg =
                 newModel =
                     { model | playback = newPlayback }
             in
-            if abs (progress - pmod.currentTime) < 1 && abs (progress - pmod.savedTime) > 5 then
+            if abs (progress - pmod.currentTime) < 1 && abs (progress - pmod.savedTime) > 1 then
                 updatePlayback newModel SaveTrackPosition
 
             else
@@ -419,6 +419,7 @@ subscriptions model =
         , onPlayed (\_ -> Playback Played)
         , onPaused (\_ -> Playback Paused)
         , onScrub (Playback << ScrubTo)
+        , onTimeSet (\_ -> Playback Play)
 
         -- , Time.every Time.second <| \_ -> Playback UpdatePostion
         ]

@@ -32,3 +32,6 @@ port pauseAudio : () -> Cmd msg
 
 
 port setCurrentTime : Float -> Cmd msg
+
+
+port onTimeSet : (() -> msg) -> Sub msg

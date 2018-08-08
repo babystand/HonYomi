@@ -28,8 +28,8 @@ namespace HonYomi.ApiControllers
             {
      
                     DataAccess.RemoveMissing();
-                    return Ok();
-             
+                return Json(true);
+
             }
             catch (Exception)
             {
@@ -45,7 +45,7 @@ namespace HonYomi.ApiControllers
             try
             {
                 DirectoryScanner.ScanWatchDirectories();
-                return Ok();
+                return Json(true);
             }
             catch (Exception)
             {
@@ -127,7 +127,7 @@ namespace HonYomi.ApiControllers
 
                     db.SaveChanges();
                 }
-                return Ok();
+                return Json(model);
             }
             catch (Exception)
             {

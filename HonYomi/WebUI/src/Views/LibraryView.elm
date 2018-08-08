@@ -1,7 +1,6 @@
 module LibraryView exposing (..)
 
 import Array exposing (..)
-import Exts.Maybe exposing (isJust)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -43,7 +42,7 @@ fileRowView index file =
     in
     div [ rowClass ]
         [ div [ class "file-gap-col" ] []
-        , div [ class "file-play-col" ] [ i [ class "fas fa-play" ] [] ]
+        , div [ class "file-play-col", onClick <| Playback (SetTrackReload <| Just file) ] [ i [ class "fas fa-play" ] [] ]
         , div [ class "file-title-col" ] [ text <| withDefault "" file.title ]
         , div [ class "file-id-col" ] [ text <| file.guid ]
         , div [ class "file-progress-col" ] [ text <| toString file.progressSeconds ]
