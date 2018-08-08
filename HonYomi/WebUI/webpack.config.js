@@ -128,7 +128,8 @@ if (MODE === "production") {
             }),
             new CopyWebpackPlugin([
                 {
-                    from: "src/assets"
+                    from: "src",
+                    ignore: ['*.elm', '*.js', '*.html', '*.scss']
                 }
             ]),
             new MiniCssExtractPlugin({
