@@ -1,3 +1,14 @@
 HonYomi
 
-here's a stupidly long c-major scale for byterange checking: https://www.dropbox.com/s/6b1irjcqtcu41f7/long.7z?dl=0 
+Simple audiobook server written in C# (dotnet core) and Elm, for Linux, Windows, and (probably but I have no way to check) MacOS.
+
+Scans directory paths to recursively index books/files.
+Tracks which file in a book you're on, and what your progression for that book is.
+
+todo:
+- full multi-user support
+- better book information, scraping details from web
+- better file metadata (eg. duration, ID3 tags)
+- book progress logging (view progression rate, see "checkpoints" in case of mistaken seeking ruining actual listening position)
+- more audio controls
+- better UI (not likely, if I'm in charge)
