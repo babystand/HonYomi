@@ -227,7 +227,7 @@ updatePlayback model msg =
                         newPlayback =
                             setPlayback file model.token pmod
                     in
-                    updatePlayback { model | playback = Just <| newPlayback } (LoadTrack (Debug.log "urlis" newPlayback.url))
+                    updatePlayback { model | playback = Just <| newPlayback } (LoadTrack newPlayback.url)
 
                 Nothing ->
                     ( model, Cmd.none )
@@ -241,7 +241,7 @@ updatePlayback model msg =
                     ( model, Cmd.none )
 
         LoadTrack url ->
-            ( model, setAudioSource (Debug.log "urlisis" url) )
+            ( model, setAudioSource url )
 
         AudioLoaded ->
             let
