@@ -194,3 +194,37 @@ nextTrackRequest tok trackid =
     Http.send mapNextTrackRequest <|
         Jwt.get tok ("/api/books/settrack/" ++ trackid) <|
             decodeServerFile
+
+
+mapChangeUsernameRequest : Result Http.Error a -> M.Msg
+mapChangeUsernameRequest result =
+    case result of
+        Ok _ ->
+            M.Config M.ChangeUsernameSuccess
+
+        Err _ ->
+            M.Config M.ChangeUsernameError
+
+
+changeUsernameRequest : Models.Token -> String -> Cmd M.Msg
+changeUsernameRequest tok username =
+    Http.send mapChangeUsernameRequest <|
+        Jwt.get tok ("/api/auth/changeusername/" ++ username) <|
+            Json.Decode.bool
+
+
+mapChangePasswordRequest : Result Http.Error a -> M.Msg
+mapChangePasswordRequest result =
+    case result of
+        Ok _ ->
+            M.Config M.ChangePasswordSuccess
+
+        Err _ ->
+            M.Config M.ChangePasswordError
+
+
+changePasswordRequest : Models.Token -> User.UserCreds -> Cmd M.Msg
+changePasswordRequest tok creds =
+    Http.send mapChangePasswordRequest <|
+        Jwt.post tok "/api/auth/changepassword" (jsonBody <| encodeUserCreds creds) <|
+            Json.Decode.bool

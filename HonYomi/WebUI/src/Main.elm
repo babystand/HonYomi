@@ -183,23 +183,34 @@ updateConfigPage model config cpage =
             in
             ( { model | page = ConfigPage newPage }, Cmd.none )
 
+        SetConfigNewPassword2Field s ->
+            let
+                newPage =
+                    { cpage | newPassword2 = s }
+            in
+            ( { model | page = ConfigPage newPage }, Cmd.none )
+
         ChangeUsernameRequest ->
-            Debug.crash "TODO"
+            ( model, changeUsernameRequest model.token cpage.username )
 
         ChangeUsernameSuccess ->
-            Debug.crash "TODO"
+            update (Config <| SetConfigUsernameField "") model
 
         ChangeUsernameError ->
-            Debug.crash "TODO"
+            ( model, Cmd.none )
 
         ChangePasswordRequest ->
-            Debug.crash "TODO"
+            ( model, changePasswordRequest model.token { username = "", password = cpage.password, newPassword = cpage.newPassword } )
 
         ChangePasswordSuccess ->
-            Debug.crash "TODO"
+            let
+                ( passEmpty, _ ) =
+                    update (Config <| SetConfigPasswordField "") model
+            in
+            update (Config <| SetConfigNewPasswordField "") passEmpty
 
         ChangePasswordError ->
-            Debug.crash "TODO"
+            ( model, Cmd.none )
 
 
 updatePlayback : Model -> PlaybackMsg -> ( Model, Cmd Msg )

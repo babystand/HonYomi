@@ -1,4 +1,5 @@
 @import '~purecss/build/pure.css';
+
 $white: #E3E2E2;
 $light: #CCCBCB;
 $medium: #696B6B;
@@ -9,356 +10,350 @@ $pink: #FF5672;
 $green: #C6ED68;
 $blue: #A1E8E5;
 body {
-    background: #202020;
-    margin-top: 20px;
+  background: #202020;
+  margin-top: 20px;
 }
 
 .container {
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 header {
-    display: flex;
-    align-items: center;
-    img {
-        width: 60px;
-        margin-right: 30px;
-    }
+  display: flex;
+  align-items: center;
+  img {
+    width: 60px;
+    margin-right: 30px;
+  }
 }
 
 button {
-    margin-right: 15px;
+  margin-right: 15px;
 }
 
 .page-wrapper {
-    position: absolute;
-    top: 0;
-    width: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
 }
 
 .page-body {
-    position: relative;
-    top: 30px;
+  position: relative;
+  top: 30px;
 }
 
 .main-content {
-    margin: auto;
-    max-width: 1080px;
-    min-width: 600px;
-    border: solid 5px #151515;
+  margin: auto;
+  max-width: 1080px;
+  min-width: 600px;
+  border: solid 5px #151515;
 }
 
 .page-header {
-    width: 100%;
-    top: 0;
-    position: absolute;
-    height: 25px;
+  width: 100%;
+  top: 0;
+  position: absolute;
+  height: 25px;
 }
 
 .nav-routes {
-    background: #101010;
-    border-bottom: solid 1px #171717;
-    color: $light;
+  background: #101010;
+  border-bottom: solid 1px #171717;
+  color: $light;
+  height: 25px;
+  #routes {
     height: 25px;
-    #routes {
-        height: 25px;
-        margin: auto;
-        padding-inline-start: 10px;
-        display: inline-block;
-        vertical-align: bottom;
-        .route {
-            padding-top: 2px;
-            display: inline-block;
-            vertical-align: bottom;
-            font-size: 16px;
-            height: 25px;
-            margin-right: 12px;
-            cursor: pointer;
-            &:hover {
-                background: $dark;
-            }
-        }
+    margin: auto;
+    padding-left: 10px;
+    display: inline-block;
+    vertical-align: bottom;
+    .route {
+      padding-top: 2px;
+      display: inline-block;
+      vertical-align: bottom;
+      font-size: 16px;
+      height: 25px;
+      margin-right: 12px;
+      cursor: pointer;
+      &:hover {
+        background: $dark;
+      }
     }
+  }
 }
 
 #login-section {
-    margin: 100px auto;
-    width: 300px;
-    height: 200px; // background: $dark;
-    // border: black solid 1px;
-    text-align: center;
-    color: $light;
-    border-radius: 5px;
-    #login-inner {
-        margin: 25px 15px 15px;
-        padding: 10px;
-    }
+  margin: 100px auto;
+  width: 300px;
+  height: 200px; // background: $dark;
+  // border: black solid 1px;
+  text-align: center;
+  color: $light;
+  border-radius: 5px;
+  #login-inner {
+    margin: 25px 15px 15px;
+    padding: 10px;
+  }
 }
 
 input {
-    margin: auto;
-    width: 250px;
-    height: 30px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 110%;
-    margin: 5px 0;
-    background: $dark;
-    border: none;
-    color: $light;
+  width: 250px;
+  height: 30px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 110%;
+  margin: 5px 0;
+  background: $dark;
+  border: none;
+  color: $light;
 }
 
 button {
-    margin: 25px auto auto;
-    background: $dark;
-    border-radius: 5px;
-    color: $light;
-    font-size: 1.1em;
-    font-weight: 700;
-    border-style: none;
-    border: none;
-    border-color: $medium;
-    width: 150px;
-    height: 35px;
-    text-align: center;
+  margin: 25px auto auto;
+  background: $dark;
+  border-radius: 5px;
+  color: $light;
+  font-size: 1.1em;
+  font-weight: 700;
+  border: none $medium;
+  width: 150px;
+  height: 35px;
+  text-align: center;
 }
 
 $book-grid-columns: 40px auto auto 70px;
 #library-books {
-    .book-grid-header {
-        background: #111111;
-        color: $light;
-        font-size: 12px;
-        display: grid;
-        grid-template-columns: $book-grid-columns;
-        div {
-            text-align: center;
-            border-right: solid 1px #403F40;
-            &:last-of-type {
-                border-right: none;
-            }
-        }
-        #book-play-col-header {
-            grid-column: 1;
-        }
-        #book-title-col-header {
-            grid-column: 2;
-        }
-        #book-id-col-header {
-            grid-column: 3;
-        }
-        #book-tracks-col-header {
-            grid-column: 4;
-        }
-    }
-    .book-grid {
-        background: $medium;
-        color: $light;
-        width: 100%;
-        font-size: 12px;
-        display: grid;
-        max-height: 80%;
-        overflow-y: auto;
-        width: 100%;
-        .file-rows {
-            grid-column-start: 1;
-            grid-column-end: 5;
+  .book-grid-header {
+    background: #111111;
     color: $light;
-            .file-row {
-                width: 100%;
-                display: grid;
-                grid-template-columns: 20px 20px auto auto auto;
-                grid-template-rows: auto;
-                text-align: center;
-                background: #303030;
-            }
-            .file-row-alt{
-              background: #353535;
-            }
-            .file-rows-header {
-                background: #606060;
-                color: #111111;
-                div {
-                    text-align: center;
-                    border-right: solid 1px #777777;
-                    &:last-of-type {
-                        border-right: none;
-                    }
-                }
-            }
-            .file-gap-col {
-                grid-column: 1;
-            }
-            .file-play-col {
-                grid-column: 2;
-            }
-            .file-title-col {
-                grid-column: 3;
-            }
-            .file-id-col {
-                grid-column: 4;
-            }
-            .file-progress-col {
-                grid-column: 5;
-            }
-        }
-        .book-row {
-            display: grid;
-            grid-template-columns: $book-grid-columns;
-            background: #191919;
-            .file-rows{
-              display:none;
-            }
-        }
-        .book-row-alt {
-            background: #242424;
-        }
-        >.selected-book-row {
-            background: #666666;
-            color: #111111;
-            .file-rows{
-              display:grid;
-            }
-        }
-        .book-id-col,
-        .book-play-col,
-        .book-title-col,
-        .book-tracks-col {
-            text-align: center;
-        }
-        .book-play-col {
-            grid-column: 1;
-        }
-        .book-title-col {
-            grid-column: 2;
-        }
-        .book-id-col {
-            grid-column: 3;
-        }
-        .book-tracks-col {
-            grid-column: 4;
-        }
+    font-size: 12px;
+    display: grid;
+    grid-template-columns: $book-grid-columns;
+    div {
+      text-align: center;
+      border-right: solid 1px #403F40;
+      &:last-of-type {
+        border-right: none;
+      }
     }
+    #book-play-col-header {
+      grid-column: 1;
+    }
+    #book-title-col-header {
+      grid-column: 2;
+    }
+    #book-id-col-header {
+      grid-column: 3;
+    }
+    #book-tracks-col-header {
+      grid-column: 4;
+    }
+  }
+  .book-grid {
+    background: $medium;
+    color: $light;
+    width: 100%;
+    font-size: 12px;
+    display: grid;
+    max-height: 80%;
+    overflow-y: auto;
+    .file-rows {
+      grid-column-start: 1;
+      grid-column-end: 5;
+      color: $light;
+      .file-row {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 20px 20px auto auto auto;
+        grid-template-rows: auto;
+        text-align: center;
+        background: #303030;
+      }
+      .file-row-alt {
+        background: #353535;
+      }
+      .file-rows-header {
+        background: #606060;
+        color: #111111;
+        div {
+          text-align: center;
+          border-right: solid 1px #777777;
+          &:last-of-type {
+            border-right: none;
+          }
+        }
+      }
+      .file-gap-col {
+        grid-column: 1;
+      }
+      .file-play-col {
+        grid-column: 2;
+      }
+      .file-title-col {
+        grid-column: 3;
+      }
+      .file-id-col {
+        grid-column: 4;
+      }
+      .file-progress-col {
+        grid-column: 5;
+      }
+    }
+    .book-row {
+      display: grid;
+      grid-template-columns: $book-grid-columns;
+      background: #191919;
+      .file-rows {
+        display: none;
+      }
+    }
+    .book-row-alt {
+      background: #242424;
+    }
+    > .selected-book-row {
+      background: #666666;
+      color: #111111;
+      .file-rows {
+        display: grid;
+      }
+    }
+    .book-id-col,
+    .book-play-col,
+    .book-title-col,
+    .book-tracks-col {
+      text-align: center;
+    }
+    .book-play-col {
+      grid-column: 1;
+    }
+    .book-title-col {
+      grid-column: 2;
+    }
+    .book-id-col {
+      grid-column: 3;
+    }
+    .book-tracks-col {
+      grid-column: 4;
+    }
+  }
 
 }
 
 #config-section {
-    width: 800px;
-    margin: auto;
-    background: #111111;
-    color: #CCCBCB;
-    padding-bottom: 20px;
-    #config-dirs{
-      padding-left: 10px;
-      padding-right: 10px;
+  width: 800px;
+  margin: auto;
+  background: #111111;
+  color: #CCCBCB;
+  padding-bottom: 20px;
+  #config-dirs {
+    padding-left: 10px;
+    padding-right: 10px;
 
-      .watch-dir{
-        margin: auto;
-        width: 600px;
-        text-align: center;
-        display: inline-flex;
-
-      }
-      .config-remove{
-        font-size: 24px;
-        width: 25px;
-        text-align: center;
-margin:auto;
-&:hover{
-  background: $dark;
-}
-&:active{
-  background: $medium;
-}
-      }
-      .config-path{
-        margin: auto;
-        width: 80%
-      }
-    }
-    .config-values {
-        padding-top: 20px;
-        width: 600px;
+    .watch-dir {
       margin: auto;
-        table {
-            margin: auto;
-        }
-        border: 1px dashed $white;
-        border-bottom: unset;
-    }
-    .config-dirs-section, .change-section {
-        padding-top: 10px;
-        width: 600px;
-        margin: auto;
-    }
-    .config-dirs-section{
-      border: 1px dashed $white;
-      border-top: unset;
-      border-bottom: unset;
-      margin-top: 2px;
-
-    }
-
-    .config-buttons{
+      width: 600px;
       text-align: center;
-      button{
-        margin: 10px;
+      display: inline-flex;
+
+    }
+    .config-remove {
+      font-size: 24px;
+      width: 25px;
+      text-align: center;
+      margin: auto;
+      &:hover {
+        background: $dark;
       }
-      border: 1px dashed $white;
-      border-top: unset;
-      width: 600px;
-      margin:auto;
-      margin-top: 2px;
+      &:active {
+        background: $medium;
+      }
+    }
+    .config-path {
+      margin: auto;
+      width: 80%
+    }
+  }
+  .config-values {
+    padding-top: 20px;
+    width: 600px;
+    margin: auto;
+    table {
+      margin: auto;
+    }
+    border: 1px dashed $white;
+    border-bottom: unset;
+  }
+  .config-dirs-section, .change-section {
+    padding-top: 10px;
+    width: 600px;
+    margin: auto;
+  }
+  .config-dirs-section {
+    border: 1px dashed $white;
+    border-top: unset;
+    border-bottom: unset;
+    margin-top: 2px;
+
+  }
+
+  .config-buttons {
+    text-align: center;
+    button {
+      margin: 10px;
+    }
+    border: 1px dashed $white;
+    border-top: unset;
+    width: 600px;
+    margin: 2px auto 20px;
+  }
+  .change-section {
+    width: 600px;
+    text-align: center;
+    border: 1px dashed $white;
+    margin-bottom: 20px;
+    button {
       margin-bottom: 20px;
     }
-    .change-section{
-      width: 600px;
-      text-align: center;
-      border: 1px dashed $white;
-      margin-bottom: 20px;
-button{
-  margin-bottom: 20px;
-}
-    }
+  }
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 #playback-section {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 80px;
-    background: #111111;
-    color: $light;
-    text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  background: #111111;
+  color: $light;
+  text-align: center;
 
-    #player-controls{
-      margin-top: 5px;
-      font-size: 16px;
-    }
-    #player {
-        margin: auto;
-        max-width: 1080px;
-    }
-    .player-progress{
-      text-align: center;
-    }
-    #progress-bar{
-      width : 100%;
-      height: 25px;
-      background: $dark;
-    }
-    #progress-value{
-      height: 100%;
-      background: white;
-    }
+  #player-controls {
+    margin-top: 5px;
+    font-size: 16px;
+  }
+  #player {
+    margin: auto;
+    max-width: 1080px;
+  }
+  .player-progress {
+    text-align: center;
+  }
+  #progress-bar {
+    width: 100%;
+    height: 25px;
+    background: $dark;
+  }
+  #progress-value {
+    height: 100%;
+    background: white;
+  }
 }
 
 #audio {
-    width: 100%;
+  width: 100%;
 }

@@ -49,6 +49,7 @@ type alias ConfigModel =
     , username : String
     , password : String
     , newPassword : String
+    , newPassword2 : String
     }
 
 
@@ -77,7 +78,7 @@ initLibraryModel =
 
 initConfigModel : ConfigModel
 initConfigModel =
-    { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty }, username = "", password = "", newPassword = "" }
+    { config = { watchForChanges = True, scanInterval = 59, serverPort = 5000, watchDirectories = Array.empty }, username = "", password = "", newPassword = "", newPassword2 = "" }
 
 
 initMainModel : Model

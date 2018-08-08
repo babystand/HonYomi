@@ -64,6 +64,7 @@ type ConfigMsg
     | SetConfigUsernameField String
     | SetConfigPasswordField String
     | SetConfigNewPasswordField String
+    | SetConfigNewPassword2Field String
     | ChangeUsernameRequest
     | ChangeUsernameSuccess
     | ChangeUsernameError
