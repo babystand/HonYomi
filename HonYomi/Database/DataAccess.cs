@@ -25,8 +25,8 @@ namespace DataLib
                 var config = db.Configs.Include(x => x.WatchDirectories).First();
                 return new ConfigClientModel(config.WatchForChanges, config.ScanInterval, config.ServerPort,
                                              config.WatchDirectories
-                                                   .Select(x => new WatchDirClientModel(x.Path, x.WatchDirectoryId))
-                                                   .ToArray());
+                                                 .Select(x => new WatchDirClientModel(x.Path, x.WatchDirectoryId))
+                                                 .ToArray());
             }
         }
 
@@ -39,13 +39,14 @@ namespace DataLib
                     if (!db.Books.Any(x => x.DirectoryPath == book.Path))
                     {
                         var files = book.Files.Select(x => new IndexedFile()
-                                                           {
-                                                               TrackIndex = x.Index,
-                                                               Filename   = x.Name,
-                                                               Title      = x.Name,
-                                                               FilePath   = x.Path,
-                                                               MimeType   = x.MimeType
-                                                           }).ToList();
+                        {
+                            TrackIndex = x.Index,
+                            Filename   = x.Name,
+                            Title      = x.Name,
+                            FilePath   = x.Path,
+                            MimeType   = x.MimeType,
+                            Duration   = x.Duration
+                        }).ToList();
                         db.Books.Add(new IndexedBook() {DirectoryPath = book.Path, Files = files, Title = book.Name});
                     }
                 }
@@ -98,7 +99,8 @@ namespace DataLib
         {
             using (var db = new HonyomiContext())
             {
-                IndexedFile file = db.Files.Include(x => x.Book).ThenInclude(x => x.Files).SingleOrDefault(x => x.IndexedFileId == fileId);
+                IndexedFile file = db.Files.Include(x => x.Book).ThenInclude(x => x.Files)
+                    .SingleOrDefault(x => x.IndexedFileId == fileId);
                 if (file == null)
                 {
                     //bail when such a file does not exist
@@ -106,15 +108,17 @@ namespace DataLib
                 }
 
                 FileWithProgress result = new FileWithProgress
-                                          {
-                                              Guid       = fileId,
-                                              Title      = file.Title,
-                                              BookGuid   = file.BookId,
-                                              BookTitle  = file.Book.Title,
-                                              TrackIndex = file.TrackIndex,
-                                              MediaType  = file.MimeType,
-                                              NextFile = file.Book.Files.FirstOrDefault(x => x.TrackIndex == file.TrackIndex + 1)?.IndexedFileId ?? Guid.Empty
-                                          };
+                {
+                    Guid       = fileId,
+                    Title      = file.Title,
+                    BookGuid   = file.BookId,
+                    BookTitle  = file.Book.Title,
+                    TrackIndex = file.TrackIndex,
+                    MediaType  = file.MimeType,
+                    NextFile =
+                        file.Book.Files.FirstOrDefault(x => x.TrackIndex == file.TrackIndex + 1)?.IndexedFileId ??
+                        Guid.Empty
+                };
                 FileProgress fProg = db.FileProgresses.SingleOrDefault(x => x.FileId == fileId && x.UserId == userId);
                 if (fProg == null)
                     result.ProgressSeconds = 0;
@@ -138,14 +142,14 @@ namespace DataLib
                     db.BookProgresses.SingleOrDefault(x => x.BookId == bookId && x.UserId == userId);
 
                 BookWithProgress result = new BookWithProgress
-                                          {
-                                              FileProgresses =
-                                                  book.Files.Select(x => GetUserFileProgress(userId, x.IndexedFileId))
-                                                      .ToArray(),
-                                              Guid             = book.IndexedBookId,
-                                              CurrentTrackGuid = bookp?.FileId ?? book.Files.First().IndexedFileId,
-                                              Title            = book.Title
-                                          };
+                {
+                    FileProgresses =
+                        book.Files.Select(x => GetUserFileProgress(userId, x.IndexedFileId))
+                            .ToArray(),
+                    Guid             = book.IndexedBookId,
+                    CurrentTrackGuid = bookp?.FileId ?? book.Files.First().IndexedFileId,
+                    Title            = book.Title
+                };
                 return result;
             }
         }
@@ -165,16 +169,17 @@ namespace DataLib
                     return;
                 }
 
+
                 BookProgress prog =
                     db.BookProgresses.SingleOrDefault(x => x.BookId == book.IndexedBookId && x.UserId == userId);
                 if (prog == null)
                 {
                     db.BookProgresses.Add(new BookProgress()
-                                          {
-                                              BookId = book.IndexedBookId,
-                                              FileId = trackId,
-                                              UserId = userId
-                                          });
+                    {
+                        BookId = book.IndexedBookId,
+                        FileId = trackId,
+                        UserId = userId
+                    });
                 }
                 else
                     prog.FileId = trackId;
@@ -201,7 +206,7 @@ namespace DataLib
             }
         }
 
-   
+
         public static BookWithProgress[] GetUserBooks(string userId)
         {
             using (var db = new HonyomiContext())

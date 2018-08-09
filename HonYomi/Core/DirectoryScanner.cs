@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DataLib;
 using Microsoft.EntityFrameworkCore;
+using Xabe.FFmpeg;
 
 namespace HonYomi.Core
 {
@@ -17,7 +18,7 @@ namespace HonYomi.Core
             path = Path.GetFullPath(path);
             if (Directory.Exists(path))
             {
-                List<ScannedFile> files = Directory.GetFiles(path).OrderBy(x => x).Select(ScanFile)
+                List<ScannedFile> files = Directory.GetFiles(path).OrderBy(x => x).Select(ScanFile).OfType<ScannedFile>()
                     .Where(x => audioExtensions.Contains(x.Extension)).ToList();
                 if (files.Any())
                 {
@@ -36,7 +37,16 @@ namespace HonYomi.Core
 
         private static ScannedFile ScanFile(string path, int index)
         {
-            return new ScannedFile(path, Path.GetFileNameWithoutExtension(path), Path.GetExtension(path), index, GetMimeType(Path.GetExtension(path)));
+            try
+            {
+                IMediaInfo mediaInfo = MediaInfo.Get(path).Result;
+                return new ScannedFile(path, Path.GetFileNameWithoutExtension(path), Path.GetExtension(path), index,
+                                       GetMimeType(Path.GetExtension(path)), mediaInfo.Duration);
+            }
+            catch (Exception e) //todo: ensure duration stuff works
+            {
+                return null;
+            }
         }
 
         private static string GetMimeType(string extension)
@@ -90,14 +100,16 @@ namespace HonYomi.Core
         public string Extension { get; }
         public string MimeType { get; set; }
         public int    Index     { get; }
+        public TimeSpan Duration { get; set; }
 
-        public ScannedFile(string path, string name, string extension, int index, string mime)
+        public ScannedFile(string path, string name, string extension, int index, string mime, TimeSpan duration)
         {
             Path      = path;
             Name      = name;
             Extension = extension;
             Index     = index;
             MimeType = mime;
+            Duration = duration;
         }
     }
 }
