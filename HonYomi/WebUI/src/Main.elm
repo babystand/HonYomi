@@ -269,13 +269,6 @@ updatePlayback model msg =
             else
                 ( newModel, Cmd.none )
 
-        DurationChanged dur ->
-            let
-                newPlayback =
-                    Just <| { pmod | duration = dur }
-            in
-            ( { model | playback = newPlayback }, Cmd.none )
-
         Ended ->
             let
                 newPlayback =
@@ -414,7 +407,6 @@ subscriptions model =
     Sub.batch
         [ audioProgress (Playback << ProgressChanged)
         , audioLoaded (\_ -> Playback AudioLoaded)
-        , durationChange (Playback << DurationChanged)
         , onEnded (\_ -> Playback Ended)
         , onPlayed (\_ -> Playback Played)
         , onPaused (\_ -> Playback Paused)

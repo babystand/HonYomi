@@ -123,7 +123,7 @@ button {
   text-align: center;
 }
 
-$book-grid-columns: 40px auto auto 70px;
+$book-grid-columns: 40px 40% 40% 70px;
 #library-books {
   .book-grid-header {
     background: #111111;
@@ -144,7 +144,7 @@ $book-grid-columns: 40px auto auto 70px;
     #book-title-col-header {
       grid-column: 2;
     }
-    #book-id-col-header {
+    #book-author-col-header {
       grid-column: 3;
     }
     #book-tracks-col-header {
@@ -161,7 +161,7 @@ $book-grid-columns: 40px auto auto 70px;
     overflow-y: auto;
     .file-rows {
       grid-column-start: 1;
-      grid-column-end: 5;
+      grid-column-end: 6;
       color: $light;
       .file-row {
         width: 100%;
@@ -194,7 +194,7 @@ $book-grid-columns: 40px auto auto 70px;
       .file-title-col {
         grid-column: 3;
       }
-      .file-id-col {
+      .file-index-col {
         grid-column: 4;
       }
       .file-progress-col {
@@ -216,10 +216,10 @@ $book-grid-columns: 40px auto auto 70px;
       background: #666666;
       color: #111111;
       .file-rows {
-        display: grid;
+        display: unset;
       }
     }
-    .book-id-col,
+    .book-author-col,
     .book-play-col,
     .book-title-col,
     .book-tracks-col {
@@ -231,7 +231,7 @@ $book-grid-columns: 40px auto auto 70px;
     .book-title-col {
       grid-column: 2;
     }
-    .book-id-col {
+    .book-author-col {
       grid-column: 3;
     }
     .book-tracks-col {

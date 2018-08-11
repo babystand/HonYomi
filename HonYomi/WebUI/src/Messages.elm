@@ -23,7 +23,6 @@ type PlaybackMsg
     | LoadTrack String --takes url
     | AudioLoaded
     | ProgressChanged Float
-    | DurationChanged Float
     | Ended
     | Play
     | Pause

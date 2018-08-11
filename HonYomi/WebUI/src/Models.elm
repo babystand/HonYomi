@@ -104,7 +104,7 @@ getPlayback model =
 setPlayback : ServerFile -> Token -> PlaybackModel -> PlaybackModel
 setPlayback file tok model =
     Debug.log "setp"
-        { guid = file.guid, title = withDefault "" file.title, bookTitle = withDefault "" file.bookTitle, bookId = file.bookGuid, trackIndex = file.trackIndex, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, savedTime = file.progressSeconds, currentTime = file.progressSeconds, duration = 0.0, ended = False, isPlaying = False, next = file.nextFile }
+        { guid = file.guid, title = withDefault "" file.title, bookTitle = withDefault "" file.bookTitle, bookId = file.bookGuid, trackIndex = file.trackIndex, url = "/api/tracks/stream/" ++ encodeTrackUrl tok file.guid, mediaType = file.mediaType, savedTime = file.progressSeconds, currentTime = file.progressSeconds, duration = file.duration, ended = False, isPlaying = False, next = file.nextFile }
 
 
 removeWatchDirectory : Int -> ConfigModel -> ConfigModel
