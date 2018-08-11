@@ -41,7 +41,7 @@ namespace HonYomi.Core
             {
                 IMediaInfo mediaInfo = MediaInfo.Get(path).Result;
                 return new ScannedFile(path, Path.GetFileNameWithoutExtension(path), Path.GetExtension(path), index,
-                                       GetMimeType(Path.GetExtension(path)), mediaInfo.Duration);
+                                       GetMimeType(Path.GetExtension(path)), mediaInfo?.Duration ?? TimeSpan.Zero);
             }
             catch (Exception e) //todo: ensure duration stuff works
             {

@@ -9,7 +9,7 @@ namespace DataLib
         public string      Title         { get; set; }
         public string      Filename      { get; set; }
         public string      FilePath      { get; set; }
-        public TimeSpan Duration { get; set; }
+        public double Duration { get; set; }
         public string MimeType { get; set; }
         public Guid         BookId        { get; set; }
         public IndexedBook Book          { get; set; }

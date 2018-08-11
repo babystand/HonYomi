@@ -11,6 +11,7 @@ namespace HonYomi.Exposed
         public string BookTitle       { get; set; }
         public int    TrackIndex      { get; set; }
         public double ProgressSeconds { get; set; }
+        public double Duration { get; set; }
         public string MediaType       { get; set; }
         public Guid NextFile { get; set; }
 
@@ -20,7 +21,7 @@ namespace HonYomi.Exposed
         }
 
         public FileWithProgress(Guid guid,            string title, Guid bookGuid, string bookTitle, int trackIndex,
-            double                   progressSeconds, string mediaType)
+            double                   progressSeconds, double duration, string mediaType)
         {
             Guid            = guid;
             Title           = title;
@@ -28,6 +29,7 @@ namespace HonYomi.Exposed
             BookTitle       = bookTitle;
             TrackIndex      = trackIndex;
             ProgressSeconds = progressSeconds;
+            Duration = duration;
             MediaType       = mediaType;
         }
     }

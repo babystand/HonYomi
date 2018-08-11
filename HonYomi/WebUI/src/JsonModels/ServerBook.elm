@@ -14,6 +14,8 @@ type alias ServerBook =
     { guid : String
     , currentTrackGuid : String
     , title : Maybe String
+    , author : Maybe String
+    , isbn : Maybe String
     , fileProgresses : Array ServerFile.ServerFile
     }
 
@@ -30,4 +32,6 @@ decodeServerBook =
         |> Json.Decode.Pipeline.required "guid" Json.Decode.string
         |> Json.Decode.Pipeline.required "currentTrackGuid" Json.Decode.string
         |> Json.Decode.Pipeline.required "title" (Json.Decode.maybe Json.Decode.string)
+        |> Json.Decode.Pipeline.required "author" (Json.Decode.maybe Json.Decode.string)
+        |> Json.Decode.Pipeline.required "isbn" (Json.Decode.maybe Json.Decode.string)
         |> Json.Decode.Pipeline.required "fileProgresses" (Json.Decode.array ServerFile.decodeServerFile)

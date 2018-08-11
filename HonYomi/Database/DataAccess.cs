@@ -38,6 +38,14 @@ namespace DataLib
                 {
                     if (!db.Books.Any(x => x.DirectoryPath == book.Path))
                     {
+                        var ibook = new IndexedBook() {DirectoryPath = book.Path, Title = book.Name};
+                        var bookInfo = book.Files.Select(x => BookSearch.Search(x.Name)).FirstOrDefault(x => x != null);
+                        if (bookInfo != null)
+                        {
+                            ibook.Author = bookInfo.Author;
+                            ibook.ISBN = bookInfo.ISBN;
+                            ibook.Title = bookInfo.Title;
+                        }
                         var files = book.Files.Select(x => new IndexedFile()
                         {
                             TrackIndex = x.Index,
@@ -45,9 +53,10 @@ namespace DataLib
                             Title      = x.Name,
                             FilePath   = x.Path,
                             MimeType   = x.MimeType,
-                            Duration   = x.Duration
+                            Duration   = x.Duration.TotalSeconds
                         }).ToList();
-                        db.Books.Add(new IndexedBook() {DirectoryPath = book.Path, Files = files, Title = book.Name});
+                        ibook.Files = files;
+                        db.Books.Add(ibook);
                     }
                 }
 
@@ -115,6 +124,7 @@ namespace DataLib
                     BookTitle  = file.Book.Title,
                     TrackIndex = file.TrackIndex,
                     MediaType  = file.MimeType,
+                    Duration = file.Duration,
                     NextFile =
                         file.Book.Files.FirstOrDefault(x => x.TrackIndex == file.TrackIndex + 1)?.IndexedFileId ??
                         Guid.Empty
@@ -148,7 +158,9 @@ namespace DataLib
                             .ToArray(),
                     Guid             = book.IndexedBookId,
                     CurrentTrackGuid = bookp?.FileId ?? book.Files.First().IndexedFileId,
-                    Title            = book.Title
+                    Title            = book.Title,
+                    Author = book.Author,
+                    ISBN = book.ISBN
                 };
                 return result;
             }

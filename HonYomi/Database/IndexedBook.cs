@@ -7,6 +7,8 @@ namespace DataLib
     {
         public Guid               IndexedBookId { get; set; }
         public string            Title         { get; set; }
+        public string Author { get; set; }
+        public string ISBN   { get; set; }
         public string            DirectoryPath { get; set; }
         public List<IndexedFile> Files         { get; set; }
     }

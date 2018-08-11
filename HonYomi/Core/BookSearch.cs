@@ -33,9 +33,9 @@ namespace HonYomi.Core
 
             OpenLibraryResult olr = JsonConvert.DeserializeObject<OpenLibraryResult>(response.Content.ReadAsStringAsync().Result);
             //the only successful state
-            if (olr.NumFound >= 1)
+            if (olr.NumFound >= 1 && olr.NumFound < 4)
             {
-                return new BookInfo {Title = olr.Docs[0].Title, Author = string.Join(", ", olr.Docs[0].AuthorName), ISBN = olr.Docs[0].Isbn.FirstOrDefault()};
+                return new BookInfo {Title = olr.Docs[0]?.Title ?? "", Author = string.Join(", ", olr.Docs[0]?.AuthorName ?? new string[0]), ISBN = olr.Docs[0]?.Isbn?.FirstOrDefault() ?? ""};
             }
 
             return null;

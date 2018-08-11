@@ -5,6 +5,8 @@ Simple audiobook server written in C# (dotnet core) and Elm, for Linux, Windows,
 Scans directory paths to recursively index books/files.
 Tracks which file in a book you're on, and what your progression for that book is.
 
+*requires ffmpeg on PATH*
+
 todo:
 - full multi-user support
 - better book information, scraping details from web
