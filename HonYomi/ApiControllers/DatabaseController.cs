@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using HonYomi.Database;
 using HonYomi.Exposed;
 using Microsoft.EntityFrameworkCore;
 

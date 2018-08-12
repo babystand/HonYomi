@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DataLib;
 using Hangfire.MemoryStorage.Database;
+using HonYomi.Database;
 using HonYomi.Exposed;
 using Microsoft.AspNetCore.Antiforgery.Internal;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

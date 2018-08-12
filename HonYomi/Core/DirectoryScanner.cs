@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DataLib;
+using HonYomi.Database;
 using Microsoft.EntityFrameworkCore;
 using Xabe.FFmpeg;
 

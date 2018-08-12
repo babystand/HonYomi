@@ -16,8 +16,13 @@ namespace HonYomi.Core
             str = Replace(str, @"[^a-z0-9\s-]", ""); // Remove all non valid chars      
             str = Replace(str, @"\s0+", " "); // Replace leading zeros
             str = Replace(str, @"\s+", " ").Trim();  // convert multiple spaces into one space
+            str = Replace(str, @"[a|A]udio[b|B]ook","");
+            str = Replace(str, @"[s|S]eries","");
+            str = Replace(str, @"[0-9]+\s*[o|O]\s*[0-9]+","");
+            str = Replace(str, @"pt\s*[0-9]*","");
+            str = Replace(str, @"part\s*[0-9]*","");
+            str = Replace(str, @"[0-9]+[a-z]*$","");
             str = str.Replace(" -", "");
-            str = Replace(str, @"pt\s+[0-9]*","");
             str = Replace(str, @"\s", "+");          // //Replace spaces by dashes
             return str;
         }
@@ -33,7 +38,7 @@ namespace HonYomi.Core
 
             OpenLibraryResult olr = JsonConvert.DeserializeObject<OpenLibraryResult>(response.Content.ReadAsStringAsync().Result);
             //the only successful state
-            if (olr.NumFound >= 1 && olr.NumFound < 4)
+            if (olr.NumFound >= 1 )
             {
                 return new BookInfo {Title = olr.Docs[0]?.Title ?? "", Author = string.Join(", ", olr.Docs[0]?.AuthorName ?? new string[0]), ISBN = olr.Docs[0]?.Isbn?.FirstOrDefault() ?? ""};
             }

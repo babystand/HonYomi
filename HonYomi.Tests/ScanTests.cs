@@ -1,6 +1,7 @@
 using System.Linq;
 using DataLib;
 using HonYomi.Core;
+using HonYomi.Database;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 

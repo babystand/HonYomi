@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using DataLib;
 using HonYomi.Core;
 using HonYomi.Exposed;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataLib
+namespace HonYomi.Database
 {
     public static class DataAccess
     {
@@ -45,6 +46,10 @@ namespace DataLib
                             ibook.Author = bookInfo.Author;
                             ibook.ISBN = bookInfo.ISBN;
                             ibook.Title = bookInfo.Title;
+                        }
+                        else if(book.Files.Count > 1)
+                        {
+                            ibook.Title = Util.LCS(book.Files[0].Name, book.Files[1].Name);
                         }
                         var files = book.Files.Select(x => new IndexedFile()
                         {
