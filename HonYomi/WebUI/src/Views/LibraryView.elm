@@ -9,6 +9,7 @@ import Messages exposing (..)
 import Models exposing (..)
 import ServerBook exposing (ServerBook, getCurrentTrack)
 import ServerFile exposing (ServerFile)
+import Util exposing (tryHead)
 
 
 setBookOnClick : ServerBook -> Html.Attribute Msg
@@ -49,22 +50,6 @@ fileRowView index file =
         ]
 
 
-selectedBookView : ServerBook -> Html Msg
-selectedBookView book =
-    div [ class "file-rows" ] <|
-        [ div [ class "file-row file-rows-header" ]
-            [ div [ class "file-gap-col" ] []
-            , div [ class "file-play-col" ] []
-            , div [ class "file-title-col" ] [ text "Title" ]
-            , div [ class "file-index-col" ] [ text "Index" ]
-            , div [ class "file-progress-col" ] [ text "Progress" ]
-            ]
-        ]
-            ++ (Array.toList <|
-                    Array.indexedMap fileRowView book.fileProgresses
-               )
-
-
 bookRow : String -> Int -> ServerBook -> Html Msg
 bookRow selectid index book =
     let
@@ -85,21 +70,9 @@ bookRow selectid index book =
                 ""
         ]
         [ div [ class "book-play-col", onClick <| Playback (SetTrackReload <| getCurrentTrack book) ] [ i [ class "fas fa-play" ] [] ]
-        , div [ class "book-title-col", bookOnClick selectid book ] [ text <| withDefault book.guid book.title ]
+        , div [ class "book-title-col", bookOnClick selectid book ] [ text <| book.title ]
         , div [ class "book-author-col", bookOnClick selectid book ] [ text <| withDefault "" book.author ]
         , div [ class "book-tracks-col", bookOnClick selectid book ] [ text <| toString <| Array.length book.fileProgresses ]
-        , div [ class "file-rows" ] <|
-            [ div [ class "file-row file-rows-header" ]
-                [ div [ class "file-gap-col" ] []
-                , div [ class "file-play-col" ] []
-                , div [ class "file-title-col" ] [ text "Title" ]
-                , div [ class "file-index-col" ] [ text "Index" ]
-                , div [ class "file-progress-col" ] [ text "Progress" ]
-                ]
-            ]
-                ++ (Array.toList <|
-                        Array.indexedMap fileRowView book.fileProgresses
-                   )
         ]
 
 
@@ -116,13 +89,34 @@ bookTable selectid books =
         ]
 
 
+selectedBookView : Maybe ServerBook -> Html Msg
+selectedBookView mbook =
+    case mbook of
+        Nothing ->
+            text ""
+
+        Just book ->
+            div [ id "selected-panel" ]
+                [ h2 [ class "selected-title" ] [ text book.title ]
+                ]
+
+
 libraryPageView : LibraryModel -> Html Msg
 libraryPageView libraryModel =
-    -- let
-    --     a =
-    --         Debug.log "selectedBook" libraryModel.selectedBook
-    -- in
-    div [ id "library-books" ]
-        [ libraryModel.books
-            |> bookTable libraryModel.selectedBookId
+    let
+        book =
+            getbook libraryModel.selectedBookId libraryModel.books
+    in
+    div []
+        [ div [ id "library-books" ]
+            [ libraryModel.books
+                |> bookTable libraryModel.selectedBookId
+            ]
+        , selectedBookView book
         ]
+
+
+getbook : String -> Array ServerBook -> Maybe ServerBook
+getbook guid books =
+    Array.filter (\x -> x.guid == guid) books
+        |> tryHead
