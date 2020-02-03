@@ -1,4 +1,7 @@
-HonYomi
+HonYomi - abandoned
+
+#This project is abandoned and works as-is. Any future recreation will not target Elm
+
 
 Simple audiobook server written in C# (dotnet core) and Elm, for Linux, Windows, and (probably but I have no way to check) MacOS.
 
@@ -13,4 +16,4 @@ todo:
 - better file metadata (eg. duration, ID3 tags)
 - book progress logging (view progression rate, see "checkpoints" in case of mistaken seeking ruining actual listening position)
 - more audio controls
-- better UI (not likely, if I'm in charge)
+- better UI
